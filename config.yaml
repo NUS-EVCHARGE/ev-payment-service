@@ -1,0 +1,4 @@
+---
+dsn: "root:root@tcp(localhost:3306)/evc?parseTime=true&charset=utf8mb4"
+http_address: "0.0.0.0:8080"
+user_service_url: "http://ev-charger-load-balancer-795551851.ap-southeast-1.elb.amazonaws.com/api/v1"
