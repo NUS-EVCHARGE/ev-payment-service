@@ -31,11 +31,6 @@ func InitDB(dns string) *mongo.Client {
 			logrus.WithField("err", err).Info("error disconnecting from database")
 		}
 	}
-	//defer func() {
-	//	if err := client.Disconnect(context.Background()); err != nil {
-	//		panic(err)
-	//	}
-	//}()
 
 	// Send a ping to confirm a successful connection
 	if err = client.Ping(context.Background(), nil); err != nil {

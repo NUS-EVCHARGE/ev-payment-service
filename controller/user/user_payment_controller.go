@@ -3,16 +3,20 @@ package userpayment
 import (
 	"ev-payment-service/dao"
 	"ev-payment-service/dto"
+	"github.com/sirupsen/logrus"
+	"github.com/stripe/stripe-go/v75"
+	"github.com/stripe/stripe-go/v75/paymentintent"
 )
 
 type UserPaymentController interface {
 	GetUserPaymentInfo(bookingId uint) ([]dto.UserPayment, error)
-	CreateUserPayment(userPayment dto.UserPayment) error
+	CreateUserPayment(userPayment dto.UserPayment) (string, error)
 	DeleteUserPayment(id uint) error
 	UpdateUserPayment(userPayment dto.UserPayment) error
 }
 
 type UserControllerImpl struct {
+	stripe_key string
 }
 
 func (u *UserControllerImpl) GetUserPaymentInfo(bookingId uint) ([]dto.UserPayment, error) {
@@ -24,8 +28,33 @@ func (u *UserControllerImpl) GetUserPaymentInfo(bookingId uint) ([]dto.UserPayme
 	return userPaymentEntries, nil
 }
 
-func (u *UserControllerImpl) CreateUserPayment(userPayment dto.UserPayment) error {
-	return dao.Db.CreateUserPaymentEntry(userPayment)
+func (u *UserControllerImpl) CreateUserPayment(userPayment dto.UserPayment) (string, error) {
+
+	stripe.Key = u.stripe_key
+
+	params := &stripe.PaymentIntentParams{
+		Amount:   stripe.Int64(int64(userPayment.FinalBill)),
+		Currency: stripe.String(string(stripe.CurrencySGD)),
+		AutomaticPaymentMethods: &stripe.PaymentIntentAutomaticPaymentMethodsParams{
+			Enabled: stripe.Bool(true),
+		},
+	}
+	pi, err := paymentintent.New(params)
+	logrus.WithField("pi New", pi.ClientSecret).Info("payment intent")
+
+	if err != nil {
+		logrus.WithField("err", err).Info("error creating payment intent")
+		return "", err
+	}
+
+	dbErr := dao.Db.CreateUserPaymentEntry(userPayment)
+
+	if dbErr != nil {
+		logrus.WithField("err", err).Info("error creating user payment saving into mongoDB")
+		return "", dbErr
+	} else {
+		return pi.ClientSecret, nil
+	}
 }
 
 func (u *UserControllerImpl) DeleteUserPayment(id uint) error {
@@ -40,6 +69,8 @@ var (
 	UserControllerObj UserPaymentController
 )
 
-func NewUserController() {
-	UserControllerObj = &UserControllerImpl{}
+func NewUserController(stripeKey string) {
+	UserControllerObj = &UserControllerImpl{
+		stripe_key: stripeKey,
+	}
 }

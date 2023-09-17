@@ -35,7 +35,7 @@ func main() {
 	// init db
 	var mongoHostname string = configObj.MongoDBURL
 
-	userpayment.NewUserController()
+	userpayment.NewUserController(configObj.StripeKey)
 	client := dao.InitDB(mongoHostname)
 
 	//defer disconnect from database
