@@ -14,6 +14,7 @@ type Config struct {
 	Dsn            string `mapstructure:"dsn"`
 	HttpAddress    string `mapstructure:"http_address"`
 	UserServiceUrl string `mapstructure:"user_service_url"`
+	MongoDBURL     string `mapstructure:"MongoDB_url"`
 }
 
 func ParseConfig(filename string) (*Config, error) {

@@ -2,6 +2,6 @@ package dto
 
 type UserPayment struct {
 	Payment
-	bookingId uint
-	UserEmail string
+	BookingId uint   `bson:"bookingId,omitempty"`
+	UserEmail string `bson:"userEmail,omitempty"`
 }

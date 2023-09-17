@@ -1,7 +1,10 @@
 package dto
 
+import "go.mongodb.org/mongo-driver/bson/primitive"
+
 type Payment struct {
-	ID        uint
-	TotalBill float64
-	FinalBill float64
+	ID        primitive.ObjectID `bson:"_id,omitempty"`
+	TotalBill float64            `bson:"totalBill,omitempty"`
+	FinalBill float64            `bson:"finalBill,omitempty"`
+	Status    string             `bson:"status,omitempty"`
 }
