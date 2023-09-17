@@ -68,12 +68,13 @@ func CreateUserPaymentHandler(c *gin.Context) {
 
 	userPayment.UserEmail = user.Email
 
-	createdUserPayment, err := userpayment.UserControllerObj.CreateUserPayment(userPayment)
+	err = userpayment.UserControllerObj.CreateUserPayment(userPayment)
 	if err != nil {
+		c.JSON(http.StatusBadRequest, CreateResponse(fmt.Sprintf("%v", err)))
 		return
 	}
 
-	c.JSON(http.StatusOK, createdUserPayment)
+	c.JSON(http.StatusOK, userPayment)
 	return
 }
 
@@ -105,6 +106,7 @@ func UpdateUserPaymentHandler(c *gin.Context) {
 
 	err = userpayment.UserControllerObj.UpdateUserPayment(userPayment)
 	if err != nil {
+		c.JSON(http.StatusBadRequest, CreateResponse(fmt.Sprintf("%v", err)))
 		return
 	}
 
@@ -139,6 +141,7 @@ func DeleteUserPaymentHandler(c *gin.Context) {
 
 	err = userpayment.UserControllerObj.DeleteUserPayment(uint(bookingId))
 	if err != nil {
+		c.JSON(http.StatusBadRequest, CreateResponse(fmt.Sprintf("%v", err)))
 		return
 	}
 

@@ -7,7 +7,7 @@ import (
 
 type UserPaymentController interface {
 	GetUserPaymentInfo(bookingId uint) ([]dto.UserPayment, error)
-	CreateUserPayment(userPayment dto.UserPayment) (dto.UserPayment, error)
+	CreateUserPayment(userPayment dto.UserPayment) error
 	DeleteUserPayment(id uint) error
 	UpdateUserPayment(userPayment dto.UserPayment) error
 }
@@ -24,7 +24,7 @@ func (u *UserControllerImpl) GetUserPaymentInfo(bookingId uint) ([]dto.UserPayme
 	return userPaymentEntries, nil
 }
 
-func (u *UserControllerImpl) CreateUserPayment(userPayment dto.UserPayment) (dto.UserPayment, error) {
+func (u *UserControllerImpl) CreateUserPayment(userPayment dto.UserPayment) error {
 	return dao.Db.CreateUserPaymentEntry(userPayment)
 }
 

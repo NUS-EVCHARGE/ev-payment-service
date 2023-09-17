@@ -1,6 +1,7 @@
 package main
 
 import (
+	"context"
 	"ev-payment-service/config"
 	userpayment "ev-payment-service/controller/user"
 	"ev-payment-service/dao"
@@ -8,6 +9,7 @@ import (
 	"flag"
 	"github.com/gin-gonic/gin"
 	"github.com/sirupsen/logrus"
+	"go.mongodb.org/mongo-driver/mongo"
 )
 
 var (
@@ -34,7 +36,15 @@ func main() {
 	var mongoHostname string = configObj.MongoDBURL
 
 	userpayment.NewUserController()
-	dao.InitDB(mongoHostname)
+	client := dao.InitDB(mongoHostname)
+
+	//defer disconnect from database
+	defer func(client *mongo.Client, ctx context.Context) {
+		err := client.Disconnect(ctx)
+		if err != nil {
+			logrus.WithField("err", err).Info("error disconnecting from database")
+		}
+	}(client, context.Background())
 
 	InitHttpServer(configObj.HttpAddress)
 

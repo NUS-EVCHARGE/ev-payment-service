@@ -10,10 +10,6 @@ import (
 	"time"
 )
 
-var (
-// userPaymentClient := db.client
-)
-
 func (db *dbImpl) GetUserPaymentEntry(id uint) ([]dto.UserPayment, error) {
 
 	userCollection := db.MongoClient.Database("ev").Collection("user_payment")
@@ -35,32 +31,33 @@ func (db *dbImpl) GetUserPaymentEntry(id uint) ([]dto.UserPayment, error) {
 	}
 }
 
-func (db *dbImpl) CreateUserPaymentEntry(userPayment dto.UserPayment) (dto.UserPayment, error) {
+func (db *dbImpl) CreateUserPaymentEntry(userPayment dto.UserPayment) error {
 
 	userCollection := db.MongoClient.Database("ev").Collection("user_payment")
 	ctx, _ := context.WithTimeout(context.Background(), 5*time.Second)
 	items, err := db.GetUserPaymentEntry(userPayment.BookingId)
 	if items != nil {
-		logrus.WithField("err", err).Info("error getting user payment")
-		return dto.UserPayment{}, fmt.Errorf("user payment already exists")
+		logrus.WithField("items", items).Info("user payment for booking id already exists")
+		return fmt.Errorf("user payment booking id already exists")
 	}
 	createUserPaymentResult, err := userCollection.InsertOne(ctx, userPayment)
 	if err != nil {
 		logrus.WithField("err", err).Info("error inserting user payment")
-		return dto.UserPayment{}, err
+		return err
 	} else {
 		logrus.WithField("success", createUserPaymentResult.InsertedID).Info("user payment inserted")
 		logrus.WithField("success", userPayment).Info("user payment inserted")
 	}
-	return dto.UserPayment{}, nil
+	return nil
 }
 
 func (db *dbImpl) UpdateUserPaymentEntry(userPayment dto.UserPayment) error {
 	collection := db.MongoClient.Database("ev").Collection("user_payment")
 	ctx, cancel := context.WithTimeout(context.Background(), 5*time.Second)
 	defer cancel()
-	filter := bson.M{"bookingId": userPayment.BookingId}
-	_, err := collection.UpdateOne(ctx, filter, userPayment)
+	filter := bson.M{"BookingId": userPayment.BookingId}
+	result, err := collection.UpdateOne(ctx, filter, bson.M{"$set": userPayment})
+	logrus.WithField("Update success", result).Info("user payment updated") //TODO: Updating here is not working as expected
 	if err != nil {
 		log.Fatal(err)
 	}

@@ -9,7 +9,7 @@ import (
 )
 
 type Database interface {
-	CreateUserPaymentEntry(userPayment dto.UserPayment) (dto.UserPayment, error)
+	CreateUserPaymentEntry(userPayment dto.UserPayment) error
 	GetUserPaymentEntry(id uint) ([]dto.UserPayment, error)
 	UpdateUserPaymentEntry(userPayment dto.UserPayment) error
 	DeleteUserPaymentEntry(id uint) error
@@ -23,7 +23,7 @@ type dbImpl struct {
 	MongoClient *mongo.Client
 }
 
-func InitDB(dns string) {
+func InitDB(dns string) *mongo.Client {
 	client, err := mongo.Connect(context.TODO(), options.Client().ApplyURI(dns))
 	if err != nil {
 		err := client.Disconnect(context.Background())
@@ -45,6 +45,8 @@ func InitDB(dns string) {
 	}
 
 	Db = NewDatabase(client)
+
+	return client
 }
 
 func NewDatabase(client *mongo.Client) Database {
