@@ -1,0 +1,20 @@
+version: "3.7"
+
+services:
+
+  mongodb:
+    image: mongo:latest
+    hostname: mongodb
+    container_name: mongodbTest
+    networks:
+      - logmonnet
+    environment:
+      MONGO_INITDB_ROOT_USERNAME: root
+      MONGO_INITDB_ROOT_PASSWORD: root
+    ports:
+        - 27017:27017
+
+networks:
+  logmonnet:
+    driver: bridge
+
