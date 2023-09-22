@@ -1,6 +1,7 @@
 package handler
 
 import (
+	"encoding/json"
 	"ev-payment-service/config"
 	"ev-payment-service/controller/user"
 	"ev-payment-service/dto"
@@ -59,8 +60,7 @@ func CreateUserPaymentHandler(c *gin.Context) {
 		return
 	}
 
-	err = c.BindJSON(&userPayment)
-	if err != nil {
+	if err := json.NewDecoder(c.Request.Body).Decode(&userPayment); err != nil {
 		logrus.WithField("err", err).Error("error params")
 		c.JSON(http.StatusBadRequest, CreateResponse(fmt.Sprintf("%v", err)))
 		return

@@ -47,7 +47,7 @@ func (u *UserControllerImpl) CreateUserPayment(userPayment dto.UserPayment) (str
 		return "", err
 	}
 
-	dbErr := dao.Db.CreateUserPaymentEntry(userPayment)
+	dbErr := dao.Db.CreateUserPaymentEntry(&userPayment)
 
 	if dbErr != nil {
 		logrus.WithField("err", err).Info("error creating user payment saving into mongoDB")

@@ -31,7 +31,7 @@ func (db *dbImpl) GetUserPaymentEntry(id uint) ([]dto.UserPayment, error) {
 	}
 }
 
-func (db *dbImpl) CreateUserPaymentEntry(userPayment dto.UserPayment) error {
+func (db *dbImpl) CreateUserPaymentEntry(userPayment *dto.UserPayment) error {
 
 	userCollection := db.MongoClient.Database("ev").Collection("user_payment")
 	ctx, _ := context.WithTimeout(context.Background(), 5*time.Second)
@@ -40,7 +40,7 @@ func (db *dbImpl) CreateUserPaymentEntry(userPayment dto.UserPayment) error {
 		logrus.WithField("items", items).Info("user payment for booking id already exists")
 		return fmt.Errorf("user payment booking id already exists")
 	}
-	createUserPaymentResult, err := userCollection.InsertOne(ctx, userPayment)
+	createUserPaymentResult, err := userCollection.InsertOne(ctx, &userPayment)
 	if err != nil {
 		logrus.WithField("err", err).Info("error inserting user payment")
 		return err
