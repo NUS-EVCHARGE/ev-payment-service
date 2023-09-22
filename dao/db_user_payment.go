@@ -55,7 +55,7 @@ func (db *dbImpl) UpdateUserPaymentEntry(userPayment dto.UserPayment) error {
 	collection := db.MongoClient.Database("ev").Collection("user_payment")
 	ctx, cancel := context.WithTimeout(context.Background(), 5*time.Second)
 	defer cancel()
-	filter := bson.M{"BookingId": userPayment.BookingId}
+	filter := bson.M{"bookingId": userPayment.BookingId}
 	result, err := collection.UpdateOne(ctx, filter, bson.M{"$set": userPayment})
 	logrus.WithField("Update success", result).Info("user payment updated") //TODO: Updating here is not working as expected
 	if err != nil {
