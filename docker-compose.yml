@@ -1,19 +1,30 @@
 version: "3.7"
 
 services:
-
   mongodb:
     image: mongo:latest
-    hostname: mongodb
-    container_name: mongodbTest
-    networks:
-      - logmonnet
+    hostname: localhost
+    container_name: ev-mongodb
     environment:
       MONGO_INITDB_ROOT_USERNAME: root
       MONGO_INITDB_ROOT_PASSWORD: root
     ports:
-        - 27017:27017
+      - 27017:27017
+    networks:
+      - logmonnet
 
+  ev-provider-service:
+    container_name: ev-provider-service
+    image: ev-provider-service:latest
+    build:
+      context: .
+      dockerfile: Dockerfile
+    ports:
+      - 8080:8080
+    networks:
+      - logmonnet
+    depends_on:
+      - mongodb
 networks:
   logmonnet:
     driver: bridge
