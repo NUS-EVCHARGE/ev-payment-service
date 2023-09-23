@@ -6,7 +6,7 @@ import (
 )
 
 func GetPaymentHealthCheckHandler(c *gin.Context) {
-	c.JSON(http.StatusOK, CreateResponse("Welcome to ev-provider-service"))
+	c.JSON(http.StatusOK, CreateResponse("Welcome to ev-payment-service"))
 	return
 }
 

@@ -2,6 +2,7 @@ package main
 
 import (
 	"context"
+	"encoding/json"
 	"ev-payment-service/config"
 	userpayment "ev-payment-service/controller/user"
 	"ev-payment-service/dao"
@@ -10,11 +11,17 @@ import (
 	"github.com/gin-gonic/gin"
 	"github.com/sirupsen/logrus"
 	"go.mongodb.org/mongo-driver/mongo"
+	"os"
 )
 
 var (
 	r *gin.Engine
 )
+
+type DatabaseSecret struct {
+	Username string `json:"username"`
+	Password string `json:"password"`
+}
 
 func main() {
 
@@ -32,11 +39,23 @@ func main() {
 		return
 	}
 
-	// init db
-	var mongoHostname string = configObj.MongoDBURL
-
-	userpayment.NewUserController(configObj.StripeKey)
+	var mongoHostname string
+	var documentSecret = retrieveSecretFromSecretManager("EV_DOCUMENTDV")
+	if documentSecret.Password != "" {
+		mongoHostname = "mongodb://" + documentSecret.Username + ":" + documentSecret.Password + "@docdb-2023-09-23-06-59-34.cluster-cdklkqeyoz4a.ap-southeast-1.docdb.amazonaws.com:27017/?tls=true&tlsCAFile=global-bundle.pem&replicaSet=rs0&readPreference=secondaryPreferred&retryWrites=false"
+	} else {
+		mongoHostname = configObj.MongoDBURL
+	}
 	client := dao.InitDB(mongoHostname)
+
+	var stripeKey string
+	var stripeSecret = retrieveSecretFromSecretManager("STRIPE_KEY")
+	if stripeSecret.Password != "" {
+		stripeKey = stripeSecret.Password
+	} else {
+		stripeKey = configObj.StripeKey
+	}
+	userpayment.NewUserController(stripeKey)
 
 	//defer disconnect from database
 	defer func(client *mongo.Client, ctx context.Context) {
@@ -59,14 +78,28 @@ func InitHttpServer(httpAddress string) {
 	}
 }
 
+func retrieveSecretFromSecretManager(key string) DatabaseSecret {
+	var database DatabaseSecret
+	secret := os.Getenv(key)
+	if secret != "" {
+		// Parse the JSON data into the struct
+		if err := json.Unmarshal([]byte(secret), &database); err != nil {
+			logrus.WithField("decodeSecretManager", database).Error("failed to decode value from secret manager")
+			return database
+		}
+	}
+	return database
+}
+
 func registerHandler() {
 	r.GET("/payment/home", handler.GetPaymentHealthCheckHandler)
 
 	v1 := r.Group("/api/v1")
-	v1.POST("/provider", handler.CreatePaymentHandler)
+	paymentGroup := v1.Group("/payment")
+	paymentGroup.POST("/provider", handler.CreatePaymentHandler)
 
-	v1.GET("/userpayment/:booking_id", handler.GetUserPaymentHandler)
-	v1.POST("/userpayment", handler.CreateUserPaymentHandler)
-	v1.PUT("/userpayment/:booking_id", handler.UpdateUserPaymentHandler)
-	v1.DELETE("/userpayment/:booking_id", handler.DeleteUserPaymentHandler)
+	paymentGroup.GET("/user/:booking_id", handler.GetUserPaymentHandler)
+	paymentGroup.POST("/user", handler.CreateUserPaymentHandler)
+	paymentGroup.PUT("/user/:booking_id", handler.UpdateUserPaymentHandler)
+	paymentGroup.DELETE("/user/:booking_id", handler.DeleteUserPaymentHandler)
 }

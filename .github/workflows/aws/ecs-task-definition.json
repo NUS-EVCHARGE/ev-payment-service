@@ -21,6 +21,14 @@
         {
           "name": "MYSQL_PASSWORD",
           "valueFrom": "arn:aws:secretsmanager:ap-southeast-1:021983356533:secret:rds!db-8ff5565a-53f0-4c4d-9253-1d2562a6d07e-OZBnLX"
+        },
+        {
+          "name": "STRIPE_KEY",
+          "valueFrom": "arn:aws:secretsmanager:ap-southeast-1:021983356533:secret:stripe_key-jLDSei"
+        },
+        {
+          "name": "EV_DOCUMENTDV",
+          "valueFrom": "arn:aws:secretsmanager:ap-southeast-1:021983356533:secret:ev-documentdv-KZ0zDU"
         }
       ],
       "logConfiguration": {
