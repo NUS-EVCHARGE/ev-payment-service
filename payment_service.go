@@ -23,6 +23,10 @@ type DatabaseSecret struct {
 	Password string `json:"password"`
 }
 
+type StripeSecret struct {
+	Password string `json:"stripe_key"`
+}
+
 func main() {
 
 	var (
@@ -40,7 +44,7 @@ func main() {
 	}
 
 	var mongoHostname string
-	var documentSecret = retrieveSecretFromSecretManager("EV_DOCUMENTDV")
+	var documentSecret = retrieveSecretFromSecretManager("EV_DOCUMENTDB")
 	if documentSecret.Password != "" {
 		mongoHostname = "mongodb://" + documentSecret.Username + ":" + documentSecret.Password + "@docdb-2023-09-23-06-59-34.cluster-cdklkqeyoz4a.ap-southeast-1.docdb.amazonaws.com:27017/?tls=true&tlsCAFile=global-bundle.pem&replicaSet=rs0&readPreference=secondaryPreferred&retryWrites=false"
 	} else {
@@ -49,7 +53,7 @@ func main() {
 	client := dao.InitDB(mongoHostname)
 
 	var stripeKey string
-	var stripeSecret = retrieveSecretFromSecretManager("STRIPE_KEY")
+	var stripeSecret = retrieveStripeKeyFromSecretManager("STRIPE_KEY")
 	if stripeSecret.Password != "" {
 		stripeKey = stripeSecret.Password
 	} else {
@@ -84,11 +88,24 @@ func retrieveSecretFromSecretManager(key string) DatabaseSecret {
 	if secret != "" {
 		// Parse the JSON data into the struct
 		if err := json.Unmarshal([]byte(secret), &database); err != nil {
-			logrus.WithField("decodeSecretManager", database).Error("failed to decode value from secret manager")
+			logrus.WithField("decodeSecretManager", database).Error("failed to decode value from secret manager", key)
 			return database
 		}
 	}
 	return database
+}
+
+func retrieveStripeKeyFromSecretManager(key string) StripeSecret {
+	var stripeKey StripeSecret
+	secret := os.Getenv(key)
+	if secret != "" {
+		// Parse the JSON data into the struct
+		if err := json.Unmarshal([]byte(secret), &stripeKey); err != nil {
+			logrus.WithField("decodeSecretManager", stripeKey).Error("failed to decode value from secret manager", key)
+			return stripeKey
+		}
+	}
+	return stripeKey
 }
 
 func registerHandler() {

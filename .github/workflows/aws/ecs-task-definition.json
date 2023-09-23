@@ -27,8 +27,8 @@
           "valueFrom": "arn:aws:secretsmanager:ap-southeast-1:021983356533:secret:stripe_key-jLDSei"
         },
         {
-          "name": "EV_DOCUMENTDV",
-          "valueFrom": "arn:aws:secretsmanager:ap-southeast-1:021983356533:secret:ev-documentdv-KZ0zDU"
+          "name": "EV_DOCUMENTDB",
+          "valueFrom": "arn:aws:secretsmanager:ap-southeast-1:021983356533:secret:ev-documentdb-ecFTms"
         }
       ],
       "logConfiguration": {
