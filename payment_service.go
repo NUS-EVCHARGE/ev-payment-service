@@ -24,7 +24,7 @@ type DatabaseSecret struct {
 }
 
 type StripeSecret struct {
-	Password string `json:"stripe_key"`
+	StripeKey string `json:"stripekey"`
 }
 
 func main() {
@@ -54,8 +54,8 @@ func main() {
 
 	var stripeKey string
 	var stripeSecret = retrieveStripeKeyFromSecretManager("STRIPE_KEY")
-	if stripeSecret.Password != "" {
-		stripeKey = stripeSecret.Password
+	if stripeSecret.StripeKey != "" {
+		stripeKey = stripeSecret.StripeKey
 	} else {
 		stripeKey = configObj.StripeKey
 	}
