@@ -1,6 +1,6 @@
 ---
 dsn: "root:root@tcp(localhost:3306)/evc?parseTime=true&charset=utf8mb4"
 http_address: "0.0.0.0:8080"
-user_service_url: "http://ev-charger-load-balancer-795551851.ap-southeast-1.elb.amazonaws.com/api/v1"
+base_service_url: "http://ev-charger-load-balancer-795551851.ap-southeast-1.elb.amazonaws.com/api/v1"
 MongoDB_url: "mongodb://root:root@localhost:27017/?retryWrites=true&w=majority"
 stripe_key: "Update your stripe key here"

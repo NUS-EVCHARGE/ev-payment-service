@@ -68,7 +68,7 @@ func CreateUserPaymentHandler(c *gin.Context) {
 
 	userPayment.UserEmail = user.Email
 
-	stripe, err := userpayment.UserControllerObj.CreateUserPayment(userPayment)
+	stripe, err := userpayment.UserControllerObj.CreateUserPayment(&userPayment, tokenStr)
 	if err != nil {
 		c.JSON(http.StatusBadRequest, CreateResponse(fmt.Sprintf("%v", err)))
 		return

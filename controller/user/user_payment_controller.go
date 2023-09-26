@@ -1,8 +1,10 @@
 package userpayment
 
 import (
+	"ev-payment-service/config"
 	"ev-payment-service/dao"
 	"ev-payment-service/dto"
+	"ev-payment-service/helper"
 	"github.com/sirupsen/logrus"
 	"github.com/stripe/stripe-go/v75"
 	"github.com/stripe/stripe-go/v75/paymentintent"
@@ -10,7 +12,7 @@ import (
 
 type UserPaymentController interface {
 	GetUserPaymentInfo(bookingId uint) ([]dto.UserPayment, error)
-	CreateUserPayment(userPayment dto.UserPayment) (string, error)
+	CreateUserPayment(userPayment *dto.UserPayment, token string) (string, error)
 	DeleteUserPayment(id uint) error
 	UpdateUserPayment(userPayment dto.UserPayment) error
 }
@@ -28,7 +30,7 @@ func (u *UserControllerImpl) GetUserPaymentInfo(bookingId uint) ([]dto.UserPayme
 	return userPaymentEntries, nil
 }
 
-func (u *UserControllerImpl) CreateUserPayment(userPayment dto.UserPayment) (string, error) {
+func (u *UserControllerImpl) CreateUserPayment(userPayment *dto.UserPayment, token string) (string, error) {
 
 	stripe.Key = u.stripe_key
 
@@ -47,7 +49,16 @@ func (u *UserControllerImpl) CreateUserPayment(userPayment dto.UserPayment) (str
 		return "", err
 	}
 
-	dbErr := dao.Db.CreateUserPaymentEntry(&userPayment)
+	// Get Booking information from booking service
+	booking, err := helper.Getbooking(config.GetBookingUrl, token, userPayment.BookingId)
+	if err != nil {
+		logrus.WithField("err", err).Info("error getting booking")
+		return "", err
+	}
+
+	userPayment.Booking = booking
+
+	dbErr := dao.Db.CreateUserPaymentEntry(userPayment)
 
 	if dbErr != nil {
 		logrus.WithField("err", err).Info("error creating user payment saving into mongoDB")

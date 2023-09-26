@@ -8,12 +8,14 @@ import (
 var (
 	GetUserUrl       = ""
 	GetUserUrlPrefix = "/user/get_user_info"
+	GetBookingUrl    = ""
+	GetBookingPrefix = "/booking"
 )
 
 type Config struct {
 	Dsn            string `mapstructure:"dsn"`
 	HttpAddress    string `mapstructure:"http_address"`
-	UserServiceUrl string `mapstructure:"user_service_url"`
+	BaseServiceUrl string `mapstructure:"base_service_url"`
 	MongoDBURL     string `mapstructure:"MongoDB_url"`
 	StripeKey      string `mapstructure:"stripe_key"`
 }
@@ -34,7 +36,7 @@ func ParseConfig(filename string) (*Config, error) {
 		return nil, err
 	}
 
-	GetUserUrl = config.UserServiceUrl + GetUserUrlPrefix
-	println(GetUserUrl)
+	GetUserUrl = config.BaseServiceUrl + GetUserUrlPrefix
+	GetBookingUrl = config.BaseServiceUrl + GetBookingPrefix
 	return config, nil
 }
