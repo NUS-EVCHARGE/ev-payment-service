@@ -32,6 +32,12 @@ func (u *UserControllerImpl) GetUserPaymentInfo(bookingId uint) ([]dto.UserPayme
 
 func (u *UserControllerImpl) CreateUserPayment(userPayment *dto.UserPayment, token string) (string, error) {
 
+	if userPayment.Coupon != "" {
+		userPayment.FinalBill = userPayment.TotalBill * 0.9
+	} else {
+		userPayment.FinalBill = userPayment.TotalBill
+	}
+
 	stripe.Key = u.stripe_key
 
 	params := &stripe.PaymentIntentParams{
