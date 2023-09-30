@@ -20,7 +20,7 @@ type UserPaymentController interface {
 }
 
 type UserControllerImpl struct {
-	stripe_key string
+	stripeKey string
 }
 
 func (u *UserControllerImpl) GetUserPaymentInfo(bookingId uint) ([]dto.UserPayment, error) {
@@ -40,7 +40,7 @@ func (u *UserControllerImpl) CreateUserPayment(userPayment *dto.UserPayment, tok
 		userPayment.FinalBill = userPayment.TotalBill
 	}
 
-	stripe.Key = u.stripe_key
+	stripe.Key = u.stripeKey
 
 	params := &stripe.PaymentIntentParams{
 		Amount:   stripe.Int64(int64(userPayment.FinalBill)),
@@ -111,6 +111,6 @@ var (
 
 func NewUserController(stripeKey string) {
 	UserControllerObj = &UserControllerImpl{
-		stripe_key: stripeKey,
+		stripeKey: stripeKey,
 	}
 }
