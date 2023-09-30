@@ -119,4 +119,6 @@ func registerHandler() {
 	paymentGroup.POST("/user", handler.CreateUserPaymentHandler)
 	paymentGroup.PUT("/user/:booking_id", handler.UpdateUserPaymentHandler)
 	paymentGroup.DELETE("/user/:booking_id", handler.DeleteUserPaymentHandler)
+
+	paymentGroup.POST("/user/completed/:booking_id", handler.CompleteUserPaymentHandler)
 }

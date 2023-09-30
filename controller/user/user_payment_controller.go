@@ -5,6 +5,7 @@ import (
 	"ev-payment-service/dao"
 	"ev-payment-service/dto"
 	"ev-payment-service/helper"
+	"fmt"
 	"github.com/sirupsen/logrus"
 	"github.com/stripe/stripe-go/v75"
 	"github.com/stripe/stripe-go/v75/paymentintent"
@@ -15,6 +16,7 @@ type UserPaymentController interface {
 	CreateUserPayment(userPayment *dto.UserPayment, token string) (string, error)
 	DeleteUserPayment(id uint) error
 	UpdateUserPayment(userPayment dto.UserPayment) error
+	CompleteUserPayment(userPayment *dto.UserPayment) error
 }
 
 type UserControllerImpl struct {
@@ -79,6 +81,27 @@ func (u *UserControllerImpl) DeleteUserPayment(id uint) error {
 }
 
 func (u *UserControllerImpl) UpdateUserPayment(userPayment dto.UserPayment) error {
+	return dao.Db.UpdateUserPaymentEntry(&userPayment)
+}
+
+func (u *UserControllerImpl) CompleteUserPayment(userPayment *dto.UserPayment) error {
+	items, err := u.GetUserPaymentInfo(userPayment.BookingId)
+	if err != nil {
+		return err
+	}
+
+	if len(items) >= 1 {
+		userPayment = &items[0]
+		logrus.WithField("userPayment", userPayment).Info("userPayment")
+	} else {
+		return fmt.Errorf("booking id has no pening payment")
+	}
+
+	if userPayment.Status != "waiting" {
+		return fmt.Errorf("payment has already been completed")
+	}
+
+	userPayment.Status = "completed"
 	return dao.Db.UpdateUserPaymentEntry(userPayment)
 }
 

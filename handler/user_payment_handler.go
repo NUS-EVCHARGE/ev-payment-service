@@ -151,3 +151,39 @@ func DeleteUserPaymentHandler(c *gin.Context) {
 	c.JSON(http.StatusOK, CreateResponse("success"))
 	return
 }
+
+func CompleteUserPaymentHandler(c *gin.Context) {
+	var (
+		user        userDto.User
+		userPayment dto.UserPayment
+	)
+
+	tokenStr := c.GetHeader("Authentication")
+
+	// Get User information
+	user, err := helper.GetUser(config.GetUserUrl, tokenStr)
+
+	if err != nil {
+		logrus.WithField("err", err).Error("error getting user")
+		c.JSON(http.StatusBadRequest, CreateResponse(fmt.Sprintf("%v", err)))
+		return
+	}
+
+	bookingId, err := strconv.Atoi(c.Param("booking_id"))
+	if err != nil {
+		c.JSON(http.StatusBadRequest, CreateResponse("booking id must be an integer"))
+	}
+
+	userPayment.UserEmail = user.Email
+	userPayment.BookingId = uint(bookingId)
+
+	err = userpayment.UserControllerObj.CompleteUserPayment(&userPayment)
+	if err != nil {
+		c.JSON(http.StatusBadRequest, CreateResponse(fmt.Sprintf("%v", err)))
+		return
+	}
+
+	//c.JSON(http.StatusOK, gin.H{"userPayment": userPayment})
+	c.JSON(http.StatusOK, CreateResponse("success"))
+	return
+}

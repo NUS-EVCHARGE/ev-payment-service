@@ -51,7 +51,7 @@ func (db *dbImpl) CreateUserPaymentEntry(userPayment *dto.UserPayment) error {
 	return nil
 }
 
-func (db *dbImpl) UpdateUserPaymentEntry(userPayment dto.UserPayment) error {
+func (db *dbImpl) UpdateUserPaymentEntry(userPayment *dto.UserPayment) error {
 	collection := db.MongoClient.Database("ev").Collection("user_payment")
 	ctx, cancel := context.WithTimeout(context.Background(), 5*time.Second)
 	defer cancel()
