@@ -1,6 +1,7 @@
 package userpayment
 
 import (
+	"ev-payment-service/config"
 	"ev-payment-service/dao"
 	"ev-payment-service/dto"
 	helper "ev-payment-service/helper"
@@ -46,6 +47,7 @@ func (u *UserControllerImpl) CreateUserPayment(userPayment *dto.UserPayment, tok
 
 	// Get Booking information from booking service
 	booking, err := helper.Getbooking(config.GetBookingUrl, token, userPayment.BookingId)
+	//booking, err := helper.Getbooking("http://localhost:8081/api/v1/booking", token, userPayment.BookingId)
 	if err != nil {
 		logrus.WithField("err", err).Info("error getting booking")
 		return "", err
