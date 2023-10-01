@@ -7,11 +7,14 @@ import (
 	providerpayment "ev-payment-service/controller/provider"
 	userpayment "ev-payment-service/controller/user"
 	"ev-payment-service/dao"
+	_ "ev-payment-service/docs"
 	"ev-payment-service/handler"
 	stripeHelper "ev-payment-service/helper"
 	"flag"
 	"github.com/gin-gonic/gin"
 	"github.com/sirupsen/logrus"
+	swaggerfiles "github.com/swaggo/files"
+	ginSwagger "github.com/swaggo/gin-swagger"
 	"go.mongodb.org/mongo-driver/mongo"
 	"os"
 )
@@ -113,6 +116,13 @@ func retrieveStripeKeyFromSecretManager(key string) StripeSecret {
 }
 
 func registerHandler() {
+
+	// use to generate swagger ui
+	//	@BasePath	/api/v1
+	//	@title		Provider Service API
+	//	@version	1.0
+	//	@schemes	http
+	r.GET("/payment/swagger/*any", ginSwagger.WrapHandler(swaggerfiles.Handler))
 	r.GET("/payment/home", handler.GetPaymentHealthCheckHandler)
 
 	v1 := r.Group("/api/v1")

@@ -13,6 +13,15 @@ import (
 	"strconv"
 )
 
+// @Summary Create Provider Payment
+// @Description create provider payment
+// @Tags provider payment
+// @Accept json
+// @Produce json
+// @Param authentication header string true "jwtToken of the user"
+// @Param provider_id path int true "provider id"
+// @Success 200 {object} dto.ProviderPayment "returns a provider payment object with a stripe key"
+// @Router /payment/provider [get]
 func CreateProviderPaymentHandler(c *gin.Context) {
 	var (
 		user            userDto.User
@@ -48,6 +57,17 @@ func CreateProviderPaymentHandler(c *gin.Context) {
 	}
 }
 
+// @Summary Get Provider Payment
+// @Description get provider payment
+// @Tags provider payment
+// @Accept json
+// @Produce json
+// @Param authentication header string true "jwtToken of the user"
+// @Param provider_id path int true "provider id"
+// @Param billing_month query int true "billing month"
+// @Param billing_year query int true "billing year"
+// @Success 200 {object} dto.ProviderPayment
+// @Router /payment/provider/{provider_id} [get]
 func GetProviderPaymentHandler(c *gin.Context) {
 
 	tokenStr := c.GetHeader("Authentication")
@@ -94,6 +114,15 @@ func GetProviderPaymentHandler(c *gin.Context) {
 	return
 }
 
+// @Summary Update Provider Payment
+// @Description update provider payment
+// @Tags provider payment
+// @Accept json
+// @Produce json
+// @Param authentication header string true "jwtToken of the user"
+// @Param provider_id path int true "provider id"
+// @success 200 {object} string "returns a string"
+// @Router /payment/provider/{provider_id} [put]
 func UpdateProviderPaymentHandler(c *gin.Context) {
 
 	var (
@@ -127,6 +156,17 @@ func UpdateProviderPaymentHandler(c *gin.Context) {
 	return
 }
 
+// @Summary Delete Provider Payment
+// @Description delete provider payment
+// @Tags provider payment
+// @Accept json
+// @Produce json
+// @Param authentication header string true "jwtToken of the user"
+// @Param provider_id path int true "provider id"
+// @Param billing_month query int true "billing month"
+// @Param billing_year query int true "billing year"
+// @success 200 {object} string "returns a string"
+// @Router /payment/provider/{provider_id} [delete]
 func DeleteProviderPaymentHandler(c *gin.Context) {
 
 	tokenStr := c.GetHeader("Authentication")
@@ -174,6 +214,15 @@ func DeleteProviderPaymentHandler(c *gin.Context) {
 	return
 }
 
+// @summary Complete Provider Payment
+// @description complete provider payment
+// @tags provider payment
+// @accept json
+// @produce json
+// @param authentication header string true "jwtToken of the user"
+// @param provider_id path int true "provider id"
+// @success 200 {object} string "returns a string"
+// @router /payment/provider/completed/{provider_id} [put]
 func CompleteProviderPaymentHandler(c *gin.Context) {
 
 	var (

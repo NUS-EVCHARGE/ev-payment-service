@@ -14,6 +14,15 @@ import (
 	"strconv"
 )
 
+// @Summary Get User Payment
+// @Description get user payment
+// @Tags user payment
+// @Accept json
+// @Produce json
+// @Param authentication header string true "jwtToken of the user"
+// @Param booking_id path int true "booking id"
+// @Success 200 {object} []dto.UserPayment "returns a user payment object"
+// @Router /payment/user/{booking_id} [get]
 func GetUserPaymentHandler(c *gin.Context) {
 
 	tokenStr := c.GetHeader("Authentication")
@@ -43,6 +52,14 @@ func GetUserPaymentHandler(c *gin.Context) {
 	return
 }
 
+// @Summary Create User Payment
+// @Description create user payment
+// @Tags user payment
+// @Accept json
+// @Produce json
+// @Param authentication header string true "jwtToken of the user"
+// @Router /payment/user [post]
+// @Success 200 {object} dto.UserPayment "returns a stripe id"
 func CreateUserPaymentHandler(c *gin.Context) {
 	var (
 		user        userDto.User
@@ -81,6 +98,14 @@ func CreateUserPaymentHandler(c *gin.Context) {
 
 }
 
+// @Summary Update User Payment
+// @Description update user payment
+// @Tags user payment
+// @Accept json
+// @Produce json
+// @Param authentication header string true "jwtToken of the user"
+// @Router /payment/user/{booking_id} [put]
+// @Success 200 {object} string "returns a success message"
 func UpdateUserPaymentHandler(c *gin.Context) {
 	var (
 		user        userDto.User
@@ -117,6 +142,14 @@ func UpdateUserPaymentHandler(c *gin.Context) {
 	return
 }
 
+// @Summary Delete User Payment
+// @Description delete user payment
+// @Tags user payment
+// @Accept json
+// @Produce json
+// @Param authentication header string true "jwtToken of the user"
+// @Router /payment/user/{booking_id} [delete]
+// @Success 200 {object} string "returns a success message"
 func DeleteUserPaymentHandler(c *gin.Context) {
 	var (
 		user        userDto.User
@@ -152,6 +185,14 @@ func DeleteUserPaymentHandler(c *gin.Context) {
 	return
 }
 
+// @Summary Complete User Payment
+// @Description complete user payment
+// @Tags user payment
+// @Accept json
+// @Produce json
+// @Param authentication header string true "jwtToken of the user"
+// @Router /payment/user/completed/{booking_id} [Post]
+// @Success 200 {object} string "returns a success message"
 func CompleteUserPaymentHandler(c *gin.Context) {
 	var (
 		user        userDto.User
