@@ -6,12 +6,12 @@ import (
 )
 
 var (
-	GetUserUrl       = ""
-	GetUserUrlPrefix = "/user/get_user_info"
-	GetBookingUrl    = ""
-	GetBookingPrefix = "/booking"
-	GetProviderUrl   = ""
-	GetProvderPrefix = "/provider"
+	GetUserUrl        = ""
+	GetUserUrlPrefix  = "/user/get_user_info"
+	GetBookingUrl     = ""
+	GetBookingPrefix  = "/booking"
+	GetProviderUrl    = ""
+	GetProviderPrefix = "/provider"
 )
 
 type Config struct {
@@ -40,6 +40,6 @@ func ParseConfig(filename string) (*Config, error) {
 
 	GetUserUrl = config.BaseServiceUrl + GetUserUrlPrefix
 	GetBookingUrl = config.BaseServiceUrl + GetBookingPrefix
-	GetProviderUrl = config.BaseServiceUrl + GetProvderPrefix
+	GetProviderUrl = config.BaseServiceUrl + GetProviderPrefix
 	return config, nil
 }
