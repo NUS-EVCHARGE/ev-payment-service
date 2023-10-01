@@ -173,3 +173,43 @@ func DeleteProviderPaymentHandler(c *gin.Context) {
 	c.JSON(http.StatusOK, CreateResponse("Payment deleted"))
 	return
 }
+
+func CompleteProviderPaymentHandler(c *gin.Context) {
+
+	var (
+		user            userDto.User
+		providerPayment dto.ProviderPayment
+	)
+
+	tokenStr := c.GetHeader("Authentication")
+
+	// Get User information
+	user, err := helper.GetUser(config.GetUserUrl, tokenStr)
+	if err != nil {
+		c.JSON(http.StatusBadRequest, CreateResponse(fmt.Sprintf("%v", err)))
+		return
+	}
+
+	providerId, err := strconv.Atoi(c.Param("provider_id"))
+	if err != nil {
+		c.JSON(http.StatusBadRequest, CreateResponse("Provider id must be an integer"))
+		return
+	}
+
+	if err := json.NewDecoder(c.Request.Body).Decode(&providerPayment); err != nil {
+		c.JSON(http.StatusBadRequest, CreateResponse("Error decoding request body"))
+		return
+	}
+
+	providerPayment.UserEmail = user.Email
+	providerPayment.ProviderId = uint(providerId)
+
+	err = provider.ProviderPaymentControllerObj.CompleteProviderPayment(&providerPayment)
+	if err != nil {
+		c.JSON(http.StatusBadRequest, CreateResponse(fmt.Sprintf("%v", err)))
+		return
+	}
+
+	c.JSON(http.StatusOK, CreateResponse("Payment completed"))
+	return
+}

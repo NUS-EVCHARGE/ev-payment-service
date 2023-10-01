@@ -81,6 +81,7 @@ func (p ProviderPaymentControllerImpl) CreateProviderPayment(providerPayment *dt
 
 	providerPayment.TotalCommission = providerPayment.TotalBill * providerPayment.CommissionRate
 	providerPayment.FinalBill = providerPayment.TotalBill - providerPayment.TotalCommission
+	providerPayment.Status = "waiting"
 
 	stripeClientSecret, err := helper.CreateStripeSecret(providerPayment.FinalBill)
 	if err != nil {
