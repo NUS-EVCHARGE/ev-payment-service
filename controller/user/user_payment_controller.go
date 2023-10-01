@@ -1,14 +1,11 @@
 package userpayment
 
 import (
-	"ev-payment-service/config"
 	"ev-payment-service/dao"
 	"ev-payment-service/dto"
-	"ev-payment-service/helper"
+	helper "ev-payment-service/helper"
 	"fmt"
 	"github.com/sirupsen/logrus"
-	"github.com/stripe/stripe-go/v75"
-	"github.com/stripe/stripe-go/v75/paymentintent"
 )
 
 type UserPaymentController interface {
@@ -40,17 +37,7 @@ func (u *UserControllerImpl) CreateUserPayment(userPayment *dto.UserPayment, tok
 		userPayment.FinalBill = userPayment.TotalBill
 	}
 
-	stripe.Key = u.stripeKey
-
-	params := &stripe.PaymentIntentParams{
-		Amount:   stripe.Int64(int64(userPayment.FinalBill)),
-		Currency: stripe.String(string(stripe.CurrencySGD)),
-		AutomaticPaymentMethods: &stripe.PaymentIntentAutomaticPaymentMethodsParams{
-			Enabled: stripe.Bool(true),
-		},
-	}
-	pi, err := paymentintent.New(params)
-	logrus.WithField("pi New", pi.ClientSecret).Info("payment intent")
+	stripeClientSecret, err := helper.CreateStripeSecret(userPayment.FinalBill)
 
 	if err != nil {
 		logrus.WithField("err", err).Info("error creating payment intent")
@@ -72,7 +59,7 @@ func (u *UserControllerImpl) CreateUserPayment(userPayment *dto.UserPayment, tok
 		logrus.WithField("err", err).Info("error creating user payment saving into mongoDB")
 		return "", dbErr
 	} else {
-		return pi.ClientSecret, nil
+		return stripeClientSecret, nil
 	}
 }
 

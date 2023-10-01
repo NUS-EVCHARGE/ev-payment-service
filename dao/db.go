@@ -10,16 +10,21 @@ import (
 
 type Database interface {
 	CreateUserPaymentEntry(userPayment *dto.UserPayment) error
-	GetUserPaymentEntry(id uint) ([]dto.UserPayment, error)
+	GetUserPaymentEntry(bookingId uint) ([]dto.UserPayment, error)
 	UpdateUserPaymentEntry(userPayment *dto.UserPayment) error
 	DeleteUserPaymentEntry(id uint) error
+
+	CreateProviderPaymentEntry(providerPayment *dto.ProviderPayment) error
+	GetProviderPaymentEntry(providerId uint, billingPeriod dto.ProviderBillingPeriod) ([]dto.ProviderPayment, error)
+	UpdateProviderPaymentEntry(providerPayment *dto.ProviderPayment) error
+	DeleteProviderPaymentEntry(id uint, billingPeriod dto.ProviderBillingPeriod) error
 }
 
 var (
 	Db Database
 )
 
-type dbImpl struct {
+type DbImpl struct {
 	MongoClient *mongo.Client
 }
 
@@ -45,7 +50,7 @@ func InitDB(dns string) *mongo.Client {
 }
 
 func NewDatabase(client *mongo.Client) Database {
-	return &dbImpl{
+	return &DbImpl{
 		MongoClient: client,
 	}
 }

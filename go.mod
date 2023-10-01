@@ -4,6 +4,7 @@ go 1.20
 
 require (
 	github.com/KyleBanks/depth v1.2.1 // indirect
+	github.com/NUS-EVCHARGE/ev-provider-service v0.0.0-20231001041706-0f75bae8eeb9 // indirect
 	github.com/NUS-EVCHARGE/ev-user-service v0.0.0-20230903081502-6eac57c3e05d // indirect
 	github.com/akhettar/gin-jwt-cognito v0.11.0 // indirect
 	github.com/bytedance/sonic v1.10.1 // indirect

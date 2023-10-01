@@ -69,9 +69,6 @@ func Getbooking(getBookingUrl string, jwtToken string, bookingId uint) (dto2.Boo
 	if err != nil {
 		return booking, err
 	}
-	if err != nil {
-		return booking, err
-	}
 
 	err = json.Unmarshal(respByte, &booking)
 	if err != nil {

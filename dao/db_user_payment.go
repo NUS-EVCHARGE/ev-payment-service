@@ -10,7 +10,7 @@ import (
 	"time"
 )
 
-func (db *dbImpl) GetUserPaymentEntry(id uint) ([]dto.UserPayment, error) {
+func (db *DbImpl) GetUserPaymentEntry(id uint) ([]dto.UserPayment, error) {
 
 	userCollection := db.MongoClient.Database("ev").Collection("user_payment")
 
@@ -31,7 +31,7 @@ func (db *dbImpl) GetUserPaymentEntry(id uint) ([]dto.UserPayment, error) {
 	}
 }
 
-func (db *dbImpl) CreateUserPaymentEntry(userPayment *dto.UserPayment) error {
+func (db *DbImpl) CreateUserPaymentEntry(userPayment *dto.UserPayment) error {
 
 	userCollection := db.MongoClient.Database("ev").Collection("user_payment")
 	ctx, _ := context.WithTimeout(context.Background(), 5*time.Second)
@@ -46,12 +46,11 @@ func (db *dbImpl) CreateUserPaymentEntry(userPayment *dto.UserPayment) error {
 		return err
 	} else {
 		logrus.WithField("success", createUserPaymentResult.InsertedID).Info("user payment inserted")
-		logrus.WithField("success", userPayment).Info("user payment inserted")
 	}
 	return nil
 }
 
-func (db *dbImpl) UpdateUserPaymentEntry(userPayment *dto.UserPayment) error {
+func (db *DbImpl) UpdateUserPaymentEntry(userPayment *dto.UserPayment) error {
 	collection := db.MongoClient.Database("ev").Collection("user_payment")
 	ctx, cancel := context.WithTimeout(context.Background(), 5*time.Second)
 	defer cancel()
@@ -63,7 +62,7 @@ func (db *dbImpl) UpdateUserPaymentEntry(userPayment *dto.UserPayment) error {
 	return nil
 }
 
-func (db *dbImpl) DeleteUserPaymentEntry(id uint) error {
+func (db *DbImpl) DeleteUserPaymentEntry(id uint) error {
 	collection := db.MongoClient.Database("ev").Collection("user_payment")
 	ctx, cancel := context.WithTimeout(context.Background(), 5*time.Second)
 	defer cancel()

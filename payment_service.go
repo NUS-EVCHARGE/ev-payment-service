@@ -4,9 +4,11 @@ import (
 	"context"
 	"encoding/json"
 	"ev-payment-service/config"
+	providerpayment "ev-payment-service/controller/provider"
 	userpayment "ev-payment-service/controller/user"
 	"ev-payment-service/dao"
 	"ev-payment-service/handler"
+	stripeHelper "ev-payment-service/helper"
 	"flag"
 	"github.com/gin-gonic/gin"
 	"github.com/sirupsen/logrus"
@@ -60,6 +62,8 @@ func main() {
 		stripeKey = configObj.StripeKey
 	}
 	userpayment.NewUserController(stripeKey)
+	providerpayment.NewProviderPaymentController(stripeKey)
+	stripeHelper.StripeKey = stripeKey
 
 	//defer disconnect from database
 	defer func(client *mongo.Client, ctx context.Context) {
@@ -113,7 +117,13 @@ func registerHandler() {
 
 	v1 := r.Group("/api/v1")
 	paymentGroup := v1.Group("/payment")
-	paymentGroup.POST("/provider", handler.CreatePaymentHandler)
+	paymentGroup.GET("/invoice", handler.GetInvoiceHandler)
+	paymentGroup.POST("/invoice", handler.CreateInvoiceHandler)
+
+	paymentGroup.GET("/provider/:provider_id", handler.GetProviderPaymentHandler)
+	paymentGroup.POST("/provider", handler.CreateProviderPaymentHandler)
+	paymentGroup.PUT("/provider/:provider_id", handler.UpdateProviderPaymentHandler)
+	paymentGroup.DELETE("/provider/:provider_id", handler.DeleteProviderPaymentHandler)
 
 	paymentGroup.GET("/user/:booking_id", handler.GetUserPaymentHandler)
 	paymentGroup.POST("/user", handler.CreateUserPaymentHandler)

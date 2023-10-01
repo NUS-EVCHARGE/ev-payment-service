@@ -10,6 +10,8 @@ var (
 	GetUserUrlPrefix = "/user/get_user_info"
 	GetBookingUrl    = ""
 	GetBookingPrefix = "/booking"
+	GetProviderUrl   = ""
+	GetProvderPrefix = "/provider"
 )
 
 type Config struct {
@@ -38,5 +40,6 @@ func ParseConfig(filename string) (*Config, error) {
 
 	GetUserUrl = config.BaseServiceUrl + GetUserUrlPrefix
 	GetBookingUrl = config.BaseServiceUrl + GetBookingPrefix
+	GetProviderUrl = config.BaseServiceUrl + GetProvderPrefix
 	return config, nil
 }
