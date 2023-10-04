@@ -1,0 +1,374 @@
+basePath: /api/v1
+definitions:
+  dto.Invoice:
+    properties:
+      booking_id:
+        type: integer
+      invoice_number:
+        type: string
+      payment_date:
+        type: string
+      provider_id:
+        type: integer
+      user_email:
+        type: string
+    type: object
+  dto.ProviderPayment:
+    properties:
+      CommissionRate:
+        type: number
+      ProviderId:
+        type: integer
+      Status:
+        type: string
+      TotalCommission:
+        type: number
+      UserEmail:
+        type: string
+      billingMonth:
+        type: integer
+      billingYear:
+        type: integer
+      coupon:
+        type: string
+      finalBill:
+        type: number
+      totalBill:
+        type: number
+    type: object
+  dto.UserPayment:
+    properties:
+      bookingId:
+        type: integer
+      charger_id:
+        type: integer
+      coupon:
+        type: string
+      email:
+        type: string
+      end_time:
+        type: string
+      finalBill:
+        type: number
+      start_time:
+        type: string
+      status:
+        type: string
+      totalBill:
+        type: number
+      userEmail:
+        type: string
+    type: object
+info:
+  contact: {}
+  title: Provider Service API
+  version: "1.0"
+paths:
+  /invoice:
+    get:
+      consumes:
+      - application/json
+      description: get Invoice by user or provider
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/dto.Invoice'
+      summary: Get Invoice by user or provider (not sure pending stripe integration
+        to know what is needed)
+      tags:
+      - Invoice
+    post:
+      consumes:
+      - application/json
+      description: create Invoice by user or provider
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/dto.Invoice'
+      summary: Create Invoice by user or provider (not sure pending stripe integration
+        to know what is needed)
+      tags:
+      - Invoice
+  /payment/home:
+    get:
+      consumes:
+      - application/json
+      description: perform health check status
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: returns a welcome message
+          schema:
+            additionalProperties: true
+            type: object
+      summary: Health Check
+      tags:
+      - Health Check
+  /payment/provider:
+    get:
+      consumes:
+      - application/json
+      description: create provider payment
+      parameters:
+      - description: jwtToken of the user
+        in: header
+        name: authentication
+        required: true
+        type: string
+      - description: provider id
+        in: path
+        name: provider_id
+        required: true
+        type: integer
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: returns a provider payment object with a stripe key
+          schema:
+            $ref: '#/definitions/dto.ProviderPayment'
+      summary: Create Provider Payment
+      tags:
+      - provider payment
+  /payment/provider/{provider_id}:
+    delete:
+      consumes:
+      - application/json
+      description: delete provider payment
+      parameters:
+      - description: jwtToken of the user
+        in: header
+        name: authentication
+        required: true
+        type: string
+      - description: provider id
+        in: path
+        name: provider_id
+        required: true
+        type: integer
+      - description: billing month
+        in: query
+        name: billing_month
+        required: true
+        type: integer
+      - description: billing year
+        in: query
+        name: billing_year
+        required: true
+        type: integer
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: returns a string
+          schema:
+            type: string
+      summary: Delete Provider Payment
+      tags:
+      - provider payment
+    get:
+      consumes:
+      - application/json
+      description: get provider payment
+      parameters:
+      - description: jwtToken of the user
+        in: header
+        name: authentication
+        required: true
+        type: string
+      - description: provider id
+        in: path
+        name: provider_id
+        required: true
+        type: integer
+      - description: billing month
+        in: query
+        name: billing_month
+        required: true
+        type: integer
+      - description: billing year
+        in: query
+        name: billing_year
+        required: true
+        type: integer
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/dto.ProviderPayment'
+      summary: Get Provider Payment
+      tags:
+      - provider payment
+    put:
+      consumes:
+      - application/json
+      description: update provider payment
+      parameters:
+      - description: jwtToken of the user
+        in: header
+        name: authentication
+        required: true
+        type: string
+      - description: provider id
+        in: path
+        name: provider_id
+        required: true
+        type: integer
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: returns a string
+          schema:
+            type: string
+      summary: Update Provider Payment
+      tags:
+      - provider payment
+  /payment/provider/completed/{provider_id}:
+    put:
+      consumes:
+      - application/json
+      description: complete provider payment
+      parameters:
+      - description: jwtToken of the user
+        in: header
+        name: authentication
+        required: true
+        type: string
+      - description: provider id
+        in: path
+        name: provider_id
+        required: true
+        type: integer
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: returns a string
+          schema:
+            type: string
+      summary: Complete Provider Payment
+      tags:
+      - provider payment
+  /payment/user:
+    post:
+      consumes:
+      - application/json
+      description: create user payment
+      parameters:
+      - description: jwtToken of the user
+        in: header
+        name: authentication
+        required: true
+        type: string
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: returns a stripe id
+          schema:
+            $ref: '#/definitions/dto.UserPayment'
+      summary: Create User Payment
+      tags:
+      - user payment
+  /payment/user/{booking_id}:
+    delete:
+      consumes:
+      - application/json
+      description: delete user payment
+      parameters:
+      - description: jwtToken of the user
+        in: header
+        name: authentication
+        required: true
+        type: string
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: returns a success message
+          schema:
+            type: string
+      summary: Delete User Payment
+      tags:
+      - user payment
+    get:
+      consumes:
+      - application/json
+      description: get user payment
+      parameters:
+      - description: jwtToken of the user
+        in: header
+        name: authentication
+        required: true
+        type: string
+      - description: booking id
+        in: path
+        name: booking_id
+        required: true
+        type: integer
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: returns a user payment object
+          schema:
+            items:
+              $ref: '#/definitions/dto.UserPayment'
+            type: array
+      summary: Get User Payment
+      tags:
+      - user payment
+    put:
+      consumes:
+      - application/json
+      description: update user payment
+      parameters:
+      - description: jwtToken of the user
+        in: header
+        name: authentication
+        required: true
+        type: string
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: returns a success message
+          schema:
+            type: string
+      summary: Update User Payment
+      tags:
+      - user payment
+  /payment/user/completed/{booking_id}:
+    post:
+      consumes:
+      - application/json
+      description: complete user payment
+      parameters:
+      - description: jwtToken of the user
+        in: header
+        name: authentication
+        required: true
+        type: string
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: returns a success message
+          schema:
+            type: string
+      summary: Complete User Payment
+      tags:
+      - user payment
+schemes:
+- http
+swagger: "2.0"

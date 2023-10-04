@@ -1,0 +1,87 @@
+{
+  "containerDefinitions": [
+    {
+      "name": "ev-payment-service",
+      "image": "",
+      "cpu": 0,
+      "memoryReservation": 64,
+      "portMappings": [
+        {
+          "name": "ev-payment-service-8080-tcp",
+          "containerPort": 8080,
+          "hostPort": 8083,
+          "protocol": "tcp"
+        }
+      ],
+      "essential": true,
+      "environment": [],
+      "mountPoints": [],
+      "volumesFrom": [],
+      "secrets": [
+        {
+          "name": "MYSQL_PASSWORD",
+          "valueFrom": "arn:aws:secretsmanager:ap-southeast-1:021983356533:secret:rds!db-8ff5565a-53f0-4c4d-9253-1d2562a6d07e-OZBnLX"
+        },
+        {
+          "name": "STRIPE_KEY",
+          "valueFrom": "arn:aws:secretsmanager:ap-southeast-1:021983356533:secret:stripe_key-jLDSei"
+        },
+        {
+          "name": "EV_DOCUMENTDB",
+          "valueFrom": "arn:aws:secretsmanager:ap-southeast-1:021983356533:secret:ev-documentdb-ecFTms"
+        }
+      ],
+      "logConfiguration": {
+        "logDriver": "awslogs",
+        "options": {
+          "awslogs-group": "ecs/ev-payment-service",
+          "awslogs-region": "ap-southeast-1",
+          "awslogs-stream-prefix": "ecs",
+          "mode": "non-blocking"
+        },
+        "secretOptions": []
+      }
+    }
+  ],
+  "family": "ev-charge-ecs-ev-payment-service",
+  "taskRoleArn": "arn:aws:iam::021983356533:role/ecsTaskExecutionRole",
+  "executionRoleArn": "arn:aws:iam::021983356533:role/ecsTaskExecutionRole",
+  "networkMode": "bridge",
+  "volumes": [],
+  "requiresAttributes": [
+    {
+      "name": "com.amazonaws.ecs.capability.logging-driver.awslogs"
+    },
+    {
+      "name": "ecs.capability.execution-role-awslogs"
+    },
+    {
+      "name": "com.amazonaws.ecs.capability.ecr-auth"
+    },
+    {
+      "name": "com.amazonaws.ecs.capability.docker-remote-api.1.19"
+    },
+    {
+      "name": "ecs.capability.secrets.asm.environment-variables"
+    },
+    {
+      "name": "com.amazonaws.ecs.capability.docker-remote-api.1.28"
+    },
+    {
+      "name": "com.amazonaws.ecs.capability.docker-remote-api.1.21"
+    },
+    {
+      "name": "com.amazonaws.ecs.capability.task-iam-role"
+    },
+    {
+      "name": "ecs.capability.execution-role-ecr-pull"
+    }
+  ],
+  "placementConstraints": [],
+  "compatibilities": [
+    "EC2"
+  ],
+  "cpu": "128",
+  "memory": "128",
+  "tags": []
+}
