@@ -11,12 +11,14 @@ import (
 	"ev-payment-service/handler"
 	stripeHelper "ev-payment-service/helper"
 	"flag"
+	"github.com/gin-contrib/cors"
 	"github.com/gin-gonic/gin"
 	"github.com/sirupsen/logrus"
 	swaggerfiles "github.com/swaggo/files"
 	ginSwagger "github.com/swaggo/gin-swagger"
 	"go.mongodb.org/mongo-driver/mongo"
 	"os"
+	"time"
 )
 
 var (
@@ -82,6 +84,14 @@ func main() {
 
 func InitHttpServer(httpAddress string) {
 	r = gin.Default()
+	r.Use(cors.New(cors.Config{
+		AllowOrigins:     []string{"*", "http://localhost:3000"},
+		AllowMethods:     []string{"PUT", "PATCH", "POST", "GET", "DELETE", "OPTIONS", "HEAD"},
+		AllowHeaders:     []string{"Origin", "Content-Length", "Content-Type", "authentication"},
+		ExposeHeaders:    []string{"Content-Length"},
+		AllowCredentials: true,
+		MaxAge:           12 * time.Hour,
+	}))
 	registerHandler()
 
 	if err := r.Run(httpAddress); err != nil {
