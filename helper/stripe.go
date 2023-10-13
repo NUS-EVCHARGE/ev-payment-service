@@ -14,7 +14,7 @@ func CreateStripeSecret(payableAmount float64) (string, error) {
 	stripe.Key = StripeKey
 
 	params := &stripe.PaymentIntentParams{
-		Amount:   stripe.Int64(int64(payableAmount)),
+		Amount:   stripe.Int64(int64(payableAmount * 100)),
 		Currency: stripe.String(string(stripe.CurrencySGD)),
 		AutomaticPaymentMethods: &stripe.PaymentIntentAutomaticPaymentMethodsParams{
 			Enabled: stripe.Bool(true),

@@ -185,24 +185,23 @@ func DeleteUserPaymentHandler(c *gin.Context) {
 	return
 }
 
-// @Summary Complete User Payment
+// @Summary Complete User Payment and save a record as invoice
 // @Description complete user payment
 // @Tags user payment
 // @Accept json
 // @Produce json
 // @Param authentication header string true "jwtToken of the user"
-// @Router /payment/user/completed/{booking_id} [Post]
+// @Router /payment/user/completed [Post]
 // @Success 200 {object} string "returns a success message"
 func CompleteUserPaymentHandler(c *gin.Context) {
 	var (
-		user        userDto.User
 		userPayment dto.UserPayment
 	)
 
 	tokenStr := c.GetHeader("Authentication")
 
 	// Get User information
-	user, err := helper.GetUser(config.GetUserUrl, tokenStr)
+	_, err := helper.GetUser(config.GetUserUrl, tokenStr)
 
 	if err != nil {
 		logrus.WithField("err", err).Error("error getting user")
@@ -210,13 +209,11 @@ func CompleteUserPaymentHandler(c *gin.Context) {
 		return
 	}
 
-	bookingId, err := strconv.Atoi(c.Param("booking_id"))
-	if err != nil {
-		c.JSON(http.StatusBadRequest, CreateResponse("booking id must be an integer"))
+	if err := json.NewDecoder(c.Request.Body).Decode(&userPayment); err != nil {
+		logrus.WithField("err", err).Error("error params")
+		c.JSON(http.StatusBadRequest, CreateResponse(fmt.Sprintf("%v", err)))
+		return
 	}
-
-	userPayment.UserEmail = user.Email
-	userPayment.BookingId = uint(bookingId)
 
 	err = userpayment.UserControllerObj.CompleteUserPayment(&userPayment)
 	if err != nil {

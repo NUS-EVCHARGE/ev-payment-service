@@ -33,6 +33,7 @@ func (u *UserControllerImpl) GetUserPaymentInfo(bookingId uint) ([]dto.UserPayme
 
 func (u *UserControllerImpl) CreateUserPayment(userPayment *dto.UserPayment, token string) (string, error) {
 
+	// Temporary hardcode if user has coupon will be 90% discount
 	if userPayment.Coupon != "" {
 		userPayment.FinalBill = userPayment.TotalBill * 0.9
 	} else {
@@ -47,26 +48,7 @@ func (u *UserControllerImpl) CreateUserPayment(userPayment *dto.UserPayment, tok
 		return "", err
 	}
 
-	// Get Booking information from booking service
-	booking, err := helper.Getbooking(config.GetBookingUrl, token, userPayment.BookingId)
-	//booking, err := helper.Getbooking("http://localhost:8081/api/v1/booking", token, userPayment.BookingId)
-	if err != nil {
-		logrus.WithField("err", err).Info("error getting booking")
-		return "", err
-	}
-
-	if len(booking) == 1 {
-		userPayment.Booking = booking[0]
-	}
-
-	dbErr := dao.Db.CreateUserPaymentEntry(userPayment)
-
-	if dbErr != nil {
-		logrus.WithField("err", err).Info("error creating user payment saving into mongoDB")
-		return "", dbErr
-	} else {
-		return stripeClientSecret, nil
-	}
+	return stripeClientSecret, nil
 }
 
 func (u *UserControllerImpl) DeleteUserPayment(id uint) error {
@@ -78,23 +60,11 @@ func (u *UserControllerImpl) UpdateUserPayment(userPayment dto.UserPayment) erro
 }
 
 func (u *UserControllerImpl) CompleteUserPayment(userPayment *dto.UserPayment) error {
-	items, err := u.GetUserPaymentInfo(userPayment.BookingId)
+	err := userPayment.SetCompleteStatus()
 	if err != nil {
 		return err
 	}
-
-	if len(items) >= 1 {
-		userPayment = &items[0]
-		logrus.WithField("userPayment", userPayment).Info("userPayment")
-	} else {
-		return fmt.Errorf("booking id has no pening payment")
-	}
-
-	err = userPayment.SetCompleteStatus()
-	if err != nil {
-		return err
-	}
-	return dao.Db.UpdateUserPaymentEntry(userPayment)
+	return dao.Db.CreateUserPaymentEntry(userPayment)
 }
 
 func (u *UserControllerImpl) GetAllUserPayments(token string, user dto2.User) (map[string][]dto.UserPayment, error) {
@@ -103,7 +73,8 @@ func (u *UserControllerImpl) GetAllUserPayments(token string, user dto2.User) (m
 		userPaymentResults = make(map[string][]dto.UserPayment)
 	)
 
-	bookings, err := helper.Getbooking(config.GetBookingUrl, token, 0)
+	bookings, err := helper.GetBooking(config.GetBookingUrl, token, 0)
+
 	if err != nil {
 		return nil, err
 	}
@@ -113,6 +84,12 @@ func (u *UserControllerImpl) GetAllUserPayments(token string, user dto2.User) (m
 	}
 
 	for _, booking := range bookings {
+		// Get Charger Info specific to the booking
+		charger, err := helper.GetChargerById(config.GetProviderUrl, token, booking.ChargerId)
+		if err != nil {
+			return nil, err
+		}
+
 		if booking.Status == "completed" {
 			payment, err := u.GetUserPaymentInfo(booking.ID)
 			if err != nil {
@@ -131,6 +108,23 @@ func (u *UserControllerImpl) GetAllUserPayments(token string, user dto2.User) (m
 				newUserPayment.BookingId = booking.ID
 				newUserPayment.UserEmail = user.Email
 				newUserPayment.PaymentStatus = "pending"
+
+				if len(charger) == 1 {
+					newUserPayment.ChargerAddress = charger[0].Address
+					// Get Rate for the charger
+					rates, err := helper.GetRateById(config.GetProviderUrl, token, charger[0].RatesId)
+					if err != nil {
+						newUserPayment.NormalRate = 1.0
+					} else {
+						newUserPayment.NormalRate = rates[0].NormalRate
+					}
+				} else {
+					newUserPayment.NormalRate = 1.0
+				}
+
+				// Calculate total bill
+				timeDiff := booking.EndTime.Sub(booking.StartTime)
+				newUserPayment.TotalBill = timeDiff.Minutes() * newUserPayment.NormalRate
 				userPaymentResults["pending"] = append(userPaymentResults["pending"], newUserPayment)
 			}
 		}

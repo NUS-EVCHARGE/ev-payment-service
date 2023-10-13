@@ -152,5 +152,5 @@ func registerHandler() {
 	paymentGroup.DELETE("/user/:booking_id", handler.DeleteUserPaymentHandler)
 	paymentGroup.GET("/user/getAllBooking", handler.GetAllUserPaymentHandler)
 
-	paymentGroup.POST("/user/completed/:booking_id", handler.CompleteUserPaymentHandler)
+	paymentGroup.POST("/user/completed", handler.CompleteUserPaymentHandler)
 }

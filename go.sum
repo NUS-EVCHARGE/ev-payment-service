@@ -42,6 +42,8 @@ github.com/KyleBanks/depth v1.2.1 h1:5h8fQADFrWtarTdtDudMmGsC7GPbOAu6RVB3ffsVFHc
 github.com/KyleBanks/depth v1.2.1/go.mod h1:jzSb9d0L43HxTQfT+oSA1EEp2q+ne2uh6XgeJcm8brE=
 github.com/NUS-EVCHARGE/ev-provider-service v0.0.0-20231001041706-0f75bae8eeb9 h1:JZfQEksn6436kvh+m9i8x3vrDuWZB1FVLZcXomGR4bU=
 github.com/NUS-EVCHARGE/ev-provider-service v0.0.0-20231001041706-0f75bae8eeb9/go.mod h1:i2YpFUMvMlfeHn+p6Nwg+pX0WpVVDHBJCyomTdH4WIQ=
+github.com/NUS-EVCHARGE/ev-provider-service v0.0.0-20231013132232-d6617926137c h1:wfnW4LwT5W5l7JmuVxsu6He+e2RMFHoZQKgAUsZXJCk=
+github.com/NUS-EVCHARGE/ev-provider-service v0.0.0-20231013132232-d6617926137c/go.mod h1:F0NCoQKHBb1qXTnW/KrQuQizjV7BeXDHqXFc7HfhPZQ=
 github.com/NUS-EVCHARGE/ev-user-service v0.0.0-20230903081502-6eac57c3e05d h1:Wha6TfPGUJgVKUWYGcirXj9I3aewFcgdCyJkYBH6zGk=
 github.com/NUS-EVCHARGE/ev-user-service v0.0.0-20230903081502-6eac57c3e05d/go.mod h1:Rkl6Kq1scHfZhbbLZc4mbfdl7CYkzIohPLf8BmASdHI=
 github.com/akhettar/gin-jwt-cognito v0.11.0 h1:3FrydE3sBlWUptqEATuxhqqWSnmdRigvuv+4s39gpcY=
