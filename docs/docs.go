@@ -366,6 +366,44 @@ const docTemplate = `{
                 }
             }
         },
+        "/payment/user/getAllBooking": {
+            "get": {
+                "description": "get all user payments by user email address",
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "user payment"
+                ],
+                "summary": "Get All User Payments by user",
+                "parameters": [
+                    {
+                        "type": "string",
+                        "description": "jwtToken of the user",
+                        "name": "authentication",
+                        "in": "header",
+                        "required": true
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "returns a map of user payment for, pending and completed",
+                        "schema": {
+                            "type": "object",
+                            "additionalProperties": {
+                                "type": "array",
+                                "items": {
+                                    "$ref": "#/definitions/dto.UserPayment"
+                                }
+                            }
+                        }
+                    }
+                }
+            }
+        },
         "/payment/user/{booking_id}": {
             "get": {
                 "description": "get user payment",
@@ -496,11 +534,11 @@ const docTemplate = `{
                 "CommissionRate": {
                     "type": "number"
                 },
+                "PaymentStatus": {
+                    "type": "string"
+                },
                 "ProviderId": {
                     "type": "integer"
-                },
-                "Status": {
-                    "type": "string"
                 },
                 "TotalCommission": {
                     "type": "number"
@@ -545,6 +583,12 @@ const docTemplate = `{
                 },
                 "finalBill": {
                     "type": "number"
+                },
+                "id": {
+                    "type": "integer"
+                },
+                "paymentStatus": {
+                    "type": "string"
                 },
                 "start_time": {
                     "type": "string"

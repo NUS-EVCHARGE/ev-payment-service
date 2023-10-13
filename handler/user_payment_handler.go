@@ -229,6 +229,14 @@ func CompleteUserPaymentHandler(c *gin.Context) {
 	return
 }
 
+// @Summary Get All User Payments by user
+// @Description get all user payments by user email address
+// @Tags user payment
+// @Accept json
+// @Produce json
+// @Router /payment/user/getAllBooking [get]
+// @Param authentication header string true "jwtToken of the user"
+// @Success 200 {object} map[string][]dto.UserPayment "returns a map of user payment for, pending and completed"
 func GetAllUserPaymentHandler(c *gin.Context) {
 	var (
 		user userDto.User
