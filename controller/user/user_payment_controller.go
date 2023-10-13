@@ -6,6 +6,7 @@ import (
 	"ev-payment-service/dto"
 	helper "ev-payment-service/helper"
 	"fmt"
+	dto2 "github.com/NUS-EVCHARGE/ev-user-service/dto"
 	"github.com/sirupsen/logrus"
 )
 
@@ -15,6 +16,7 @@ type UserPaymentController interface {
 	DeleteUserPayment(id uint) error
 	UpdateUserPayment(userPayment dto.UserPayment) error
 	CompleteUserPayment(userPayment *dto.UserPayment) error
+	GetAllUserPayments(token string, user dto2.User) (map[string][]dto.UserPayment, error)
 }
 
 type UserControllerImpl struct {
@@ -26,7 +28,6 @@ func (u *UserControllerImpl) GetUserPaymentInfo(bookingId uint) ([]dto.UserPayme
 	if err != nil {
 		return nil, err
 	}
-
 	return userPaymentEntries, nil
 }
 
@@ -37,6 +38,7 @@ func (u *UserControllerImpl) CreateUserPayment(userPayment *dto.UserPayment, tok
 	} else {
 		userPayment.FinalBill = userPayment.TotalBill
 	}
+	userPayment.PaymentStatus = "pending"
 
 	stripeClientSecret, err := helper.CreateStripeSecret(userPayment.FinalBill)
 
@@ -53,7 +55,9 @@ func (u *UserControllerImpl) CreateUserPayment(userPayment *dto.UserPayment, tok
 		return "", err
 	}
 
-	userPayment.Booking = booking
+	if len(booking) == 1 {
+		userPayment.Booking = booking[0]
+	}
 
 	dbErr := dao.Db.CreateUserPaymentEntry(userPayment)
 
@@ -86,12 +90,53 @@ func (u *UserControllerImpl) CompleteUserPayment(userPayment *dto.UserPayment) e
 		return fmt.Errorf("booking id has no pening payment")
 	}
 
-	if userPayment.Status != "waiting" {
-		return fmt.Errorf("payment has already been completed")
+	err = userPayment.SetCompleteStatus()
+	if err != nil {
+		return err
+	}
+	return dao.Db.UpdateUserPaymentEntry(userPayment)
+}
+
+func (u *UserControllerImpl) GetAllUserPayments(token string, user dto2.User) (map[string][]dto.UserPayment, error) {
+
+	var (
+		userPaymentResults = make(map[string][]dto.UserPayment)
+	)
+
+	bookings, err := helper.Getbooking(config.GetBookingUrl, token, 0)
+	if err != nil {
+		return nil, err
 	}
 
-	userPayment.Status = "completed"
-	return dao.Db.UpdateUserPaymentEntry(userPayment)
+	if len(bookings) == 0 {
+		return nil, fmt.Errorf("no booking found for user")
+	}
+
+	for _, booking := range bookings {
+		if booking.Status == "completed" {
+			payment, err := u.GetUserPaymentInfo(booking.ID)
+			if err != nil {
+				return nil, err
+			}
+			if len(payment) == 1 {
+				if payment[0].PaymentStatus == "completed" {
+					userPaymentResults["completed"] = append(userPaymentResults["completed"], payment[0])
+				} else {
+					userPaymentResults["pending"] = append(userPaymentResults["pending"], payment[0])
+				}
+			} else {
+				//Payment is not performed and not saved into documentDB yet
+				newUserPayment := dto.UserPayment{}
+				newUserPayment.Booking = booking
+				newUserPayment.BookingId = booking.ID
+				newUserPayment.UserEmail = user.Email
+				newUserPayment.PaymentStatus = "pending"
+				userPaymentResults["pending"] = append(userPaymentResults["pending"], newUserPayment)
+			}
+		}
+	}
+
+	return userPaymentResults, nil
 }
 
 var (

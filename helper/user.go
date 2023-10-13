@@ -46,12 +46,18 @@ func GetUser(getUserUrl string, jwtToken string) (dto.User, error) {
 	return user, nil
 }
 
-func Getbooking(getBookingUrl string, jwtToken string, bookingId uint) (dto2.Booking, error) {
+func Getbooking(getBookingUrl string, jwtToken string, bookingId uint) ([]dto2.Booking, error) {
 	var (
-		booking    dto2.Booking
+		booking    []dto2.Booking
 		httpClient = http.Client{}
+		url        string
 	)
-	url := getBookingUrl + "/" + strconv.Itoa(int(bookingId))
+	if bookingId == 0 {
+		url = getBookingUrl
+	} else {
+		url = getBookingUrl + "/" + strconv.Itoa(int(bookingId))
+	}
+
 	logrus.WithField("url", url).Info("url")
 	req, err := http.NewRequest("GET", url, bytes.NewReader([]byte("")))
 	if err != nil {
@@ -75,10 +81,12 @@ func Getbooking(getBookingUrl string, jwtToken string, bookingId uint) (dto2.Boo
 		return booking, err
 	}
 
-	if booking.Email == "" {
-		var errGetBookingResp = map[string]interface{}{}
-		err = json.Unmarshal(respByte, &errGetBookingResp)
-		return booking, fmt.Errorf(errGetBookingResp["message"].(string))
+	if len(booking) > 0 {
+		if booking[0].Email == "" {
+			var errGetBookingResp = map[string]interface{}{}
+			err = json.Unmarshal(respByte, &errGetBookingResp)
+			return booking, fmt.Errorf(errGetBookingResp["message"].(string))
+		}
 	}
 
 	return booking, nil

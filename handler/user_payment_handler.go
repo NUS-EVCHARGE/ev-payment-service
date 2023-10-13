@@ -228,3 +228,32 @@ func CompleteUserPaymentHandler(c *gin.Context) {
 	c.JSON(http.StatusOK, CreateResponse("success"))
 	return
 }
+
+func GetAllUserPaymentHandler(c *gin.Context) {
+	var (
+		user userDto.User
+	)
+
+	tokenStr := c.GetHeader("Authentication")
+
+	// Get User information
+	user, err := helper.GetUser(config.GetUserUrl, tokenStr)
+
+	if err != nil {
+		logrus.WithField("err", err).Error("error getting user")
+		c.JSON(http.StatusBadRequest, CreateResponse(fmt.Sprintf("%v", err)))
+		return
+	}
+
+	userPayment, err := userpayment.UserControllerObj.GetAllUserPayments(tokenStr, user)
+
+	if err != nil {
+		logrus.WithField("err", err).Error("error getting user payment")
+		c.JSON(http.StatusBadRequest, CreateResponse(fmt.Sprintf("%v", err)))
+		return
+	}
+
+	c.JSON(http.StatusOK, userPayment)
+	return
+
+}
