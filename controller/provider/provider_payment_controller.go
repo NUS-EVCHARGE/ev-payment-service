@@ -25,11 +25,7 @@ type ProviderPaymentControllerImpl struct {
 }
 
 func (p ProviderPaymentControllerImpl) GetProviderPaymentInfo(providerId uint, billingPeriod dto.ProviderBillingPeriod) ([]dto.ProviderPayment, error) {
-	providerPayment, err := dao.Db.GetProviderPaymentEntry(providerId, billingPeriod)
-	if err != nil {
-		return nil, err
-	}
-	return providerPayment, nil
+	return dao.Db.GetProviderPaymentEntry(providerId, billingPeriod)
 }
 
 func (p ProviderPaymentControllerImpl) UpdateProviderPayment(providerPayment dto.ProviderPayment) error {
@@ -52,11 +48,10 @@ func (p ProviderPaymentControllerImpl) CompleteProviderPayment(providerPayment *
 		return fmt.Errorf("provider payment not found")
 	}
 
-	if providerPayment.Status != "waiting" {
-		return fmt.Errorf("provider payment has already been completed")
+	if err := providerPayment.SetCompleteStatus(); err != nil {
+		return err
 	}
 
-	providerPayment.Status = "completed"
 	return dao.Db.UpdateProviderPaymentEntry(providerPayment)
 }
 
@@ -81,7 +76,7 @@ func (p ProviderPaymentControllerImpl) CreateProviderPayment(providerPayment *dt
 
 	providerPayment.TotalCommission = providerPayment.TotalBill * providerPayment.CommissionRate
 	providerPayment.FinalBill = providerPayment.TotalBill - providerPayment.TotalCommission
-	providerPayment.Status = "waiting"
+	providerPayment.PaymentStatus = "pending"
 
 	stripeClientSecret, err := helper.CreateStripeSecret(providerPayment.FinalBill)
 	if err != nil {

@@ -17,10 +17,10 @@ definitions:
     properties:
       CommissionRate:
         type: number
+      PaymentStatus:
+        type: string
       ProviderId:
         type: integer
-      Status:
-        type: string
       TotalCommission:
         type: number
       UserEmail:
@@ -50,6 +50,10 @@ definitions:
         type: string
       finalBill:
         type: number
+      id:
+        type: integer
+      paymentStatus:
+        type: string
       start_time:
         type: string
       status:
@@ -367,6 +371,31 @@ paths:
           schema:
             type: string
       summary: Complete User Payment
+      tags:
+      - user payment
+  /payment/user/getAllBooking:
+    get:
+      consumes:
+      - application/json
+      description: get all user payments by user email address
+      parameters:
+      - description: jwtToken of the user
+        in: header
+        name: authentication
+        required: true
+        type: string
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: returns a map of user payment for, pending and completed
+          schema:
+            additionalProperties:
+              items:
+                $ref: '#/definitions/dto.UserPayment'
+              type: array
+            type: object
+      summary: Get All User Payments by user
       tags:
       - user payment
 schemes:
