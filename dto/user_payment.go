@@ -1,7 +1,5 @@
 package dto
 
-import "fmt"
-
 type UserPayment struct {
 	Payment
 	Booking
@@ -13,11 +11,6 @@ type UserPayment struct {
 	PaymentStatus  string  `bson:"paymentStatus,omitempty" json:"paymentStatus,omitempty"`
 }
 
-func (u *UserPayment) SetCompleteStatus() error {
-	if u.PaymentStatus == "pending" {
-		u.PaymentStatus = "completed"
-		return nil
-	} else {
-		return fmt.Errorf("user payment is not complete status")
-	}
+func (u *UserPayment) SetCompleteStatus() {
+	u.PaymentStatus = "completed"
 }

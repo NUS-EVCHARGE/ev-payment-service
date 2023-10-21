@@ -60,10 +60,7 @@ func (u *UserControllerImpl) UpdateUserPayment(userPayment dto.UserPayment) erro
 }
 
 func (u *UserControllerImpl) CompleteUserPayment(userPayment *dto.UserPayment) error {
-	err := userPayment.SetCompleteStatus()
-	if err != nil {
-		return err
-	}
+	userPayment.SetCompleteStatus()
 	return dao.Db.CreateUserPaymentEntry(userPayment)
 }
 
