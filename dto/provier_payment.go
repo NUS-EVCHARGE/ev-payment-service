@@ -12,6 +12,12 @@ type ProviderPayment struct {
 	PaymentStatus   string  `bson:"PaymentStatus,omitempty" json:"PaymentStatus,omitempty"`
 }
 
+type ProviderEarnings struct {
+	TotalEarnings   float64 `bson:"TotalEarnings,omitempty" json:"TotalEarnings,omitempty"`
+	TotalCommission float64 `bson:"TotalCommission,omitempty" json:"TotalCommission,omitempty"`
+	NetEarnings     float64 `bson:"NetEarnings,omitempty" json:"NetEarnings,omitempty"`
+}
+
 func (p ProviderPayment) SetCompleteStatus() error {
 	if p.PaymentStatus == "waiting" {
 		p.PaymentStatus = "completed"
