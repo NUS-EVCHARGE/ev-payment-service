@@ -14,6 +14,7 @@ type ProviderPaymentController interface {
 	UpdateProviderPayment(providerPayment dto.ProviderPayment) error
 	DeleteProviderPayment(id uint, billingPeriod dto.ProviderBillingPeriod) error
 	CompleteProviderPayment(providerPayment *dto.ProviderPayment) error
+	GetProviderTotalEarningsByProviderID(providerId uint) (dto.ProviderEarnings, error)
 }
 
 var (
@@ -89,6 +90,30 @@ func (p ProviderPaymentControllerImpl) CreateProviderPayment(providerPayment *dt
 	} else {
 		return stripeClientSecret, nil
 	}
+}
+
+func (p ProviderPaymentControllerImpl) GetProviderTotalEarningsByProviderID(providerId uint) (dto.ProviderEarnings, error) {
+	providerPaymentResult, err := dao.Db.GetUserPaymentByProviderId(providerId)
+	if err != nil {
+		return dto.ProviderEarnings{
+			TotalEarnings:   0,
+			TotalCommission: 0,
+			NetEarnings:     0,
+		}, fmt.Errorf("error getting provider payment: %v", err)
+	}
+
+	var totalEarnings float64
+	var totalCommission float64
+	for _, providerPayment := range providerPaymentResult {
+		totalEarnings = totalEarnings + providerPayment.TotalBill
+		totalCommission = totalCommission + (providerPayment.TotalBill * 0.05)
+	}
+
+	return dto.ProviderEarnings{
+		TotalEarnings:   totalEarnings,
+		TotalCommission: totalCommission,
+		NetEarnings:     totalEarnings - totalCommission,
+	}, nil
 }
 
 func NewProviderPaymentController(stripeKey string) {

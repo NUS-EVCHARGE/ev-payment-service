@@ -11,6 +11,7 @@ import (
 type Database interface {
 	CreateUserPaymentEntry(userPayment *dto.UserPayment) error
 	GetUserPaymentEntry(bookingId uint) ([]dto.UserPayment, error)
+	GetUserPaymentByProviderId(providerId uint) ([]dto.UserPayment, error)
 	UpdateUserPaymentEntry(userPayment *dto.UserPayment) error
 	DeleteUserPaymentEntry(id uint) error
 

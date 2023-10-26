@@ -104,6 +104,7 @@ func (u *UserControllerImpl) GetAllUserPayments(token string, user dto2.User) (m
 				newUserPayment.Booking = booking
 				newUserPayment.BookingId = booking.ID
 				newUserPayment.UserEmail = user.Email
+				newUserPayment.ProviderId = charger[0].ProviderId
 				newUserPayment.PaymentStatus = "pending"
 
 				if len(charger) == 1 {

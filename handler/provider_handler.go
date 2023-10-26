@@ -262,3 +262,29 @@ func CompleteProviderPaymentHandler(c *gin.Context) {
 	c.JSON(http.StatusOK, CreateResponse("Payment completed"))
 	return
 }
+
+func GetProviderTotalEarningsByProviderIDHandler(c *gin.Context) {
+	tokenStr := c.GetHeader("Authentication")
+
+	// Get User information
+	_, err := helper.GetUser(config.GetUserUrl, tokenStr)
+	if err != nil {
+		c.JSON(http.StatusBadRequest, CreateResponse("Error getting user"))
+		return
+	}
+
+	providerId, err := strconv.Atoi(c.Param("provider_id"))
+	if err != nil {
+		c.JSON(http.StatusBadRequest, CreateResponse("Provider id must be an integer"))
+		return
+	}
+
+	totalEarnings, err := provider.ProviderPaymentControllerObj.GetProviderTotalEarningsByProviderID(uint(providerId))
+	if err != nil {
+		c.JSON(http.StatusBadRequest, CreateResponse(fmt.Sprintf("%v", err)))
+		return
+	}
+
+	c.JSON(http.StatusOK, totalEarnings)
+	return
+}

@@ -31,6 +31,27 @@ func (db *DbImpl) GetUserPaymentEntry(id uint) ([]dto.UserPayment, error) {
 	}
 }
 
+func (db *DbImpl) GetUserPaymentByProviderId(providerId uint) ([]dto.UserPayment, error) {
+
+	userCollection := db.MongoClient.Database("ev").Collection("user_payment")
+
+	ctx, _ := context.WithTimeout(context.Background(), 5*time.Second)
+	filterCursor, err := userCollection.Find(ctx, bson.M{"providerId": providerId})
+	if err != nil {
+		logrus.WithField("err", err).Info("error getting user payment")
+		return nil, err
+	}
+
+	var userPaymentFiltered []dto.UserPayment
+	if err = filterCursor.All(ctx, &userPaymentFiltered); err != nil {
+		logrus.WithField("err", err).Info("error getting user payment")
+		return nil, err
+	} else {
+		logrus.WithField("success", userPaymentFiltered).Info("user payment retrieved")
+		return userPaymentFiltered, nil
+	}
+}
+
 func (db *DbImpl) CreateUserPaymentEntry(userPayment *dto.UserPayment) error {
 
 	userCollection := db.MongoClient.Database("ev").Collection("user_payment")
