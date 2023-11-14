@@ -124,7 +124,7 @@ paths:
       tags:
       - Health Check
   /payment/provider:
-    get:
+    post:
       consumes:
       - application/json
       description: create provider payment

@@ -84,7 +84,7 @@ const docTemplate = `{
             }
         },
         "/payment/provider": {
-            "get": {
+            "post": {
                 "description": "create provider payment",
                 "consumes": [
                     "application/json"

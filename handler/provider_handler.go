@@ -21,7 +21,7 @@ import (
 // @Param authentication header string true "jwtToken of the user"
 // @Param provider_id path int true "provider id"
 // @Success 200 {object} dto.ProviderPayment "returns a provider payment object with a stripe key"
-// @Router /payment/provider [get]
+// @Router /payment/provider [POST]
 func CreateProviderPaymentHandler(c *gin.Context) {
 	var (
 		user            userDto.User
