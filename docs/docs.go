@@ -334,39 +334,7 @@ const docTemplate = `{
                 }
             }
         },
-        "/payment/user/completed/{booking_id}": {
-            "post": {
-                "description": "complete user payment",
-                "consumes": [
-                    "application/json"
-                ],
-                "produces": [
-                    "application/json"
-                ],
-                "tags": [
-                    "user payment"
-                ],
-                "summary": "Complete User Payment",
-                "parameters": [
-                    {
-                        "type": "string",
-                        "description": "jwtToken of the user",
-                        "name": "authentication",
-                        "in": "header",
-                        "required": true
-                    }
-                ],
-                "responses": {
-                    "200": {
-                        "description": "returns a success message",
-                        "schema": {
-                            "type": "string"
-                        }
-                    }
-                }
-            }
-        },
-        "/payment/user/getAllBooking": {
+        "/payment/user/booking": {
             "get": {
                 "description": "get all user payments by user email address",
                 "consumes": [
@@ -404,7 +372,7 @@ const docTemplate = `{
                 }
             }
         },
-        "/payment/user/{booking_id}": {
+        "/payment/user/booking/{booking_id}": {
             "get": {
                 "description": "get user payment",
                 "consumes": [
@@ -505,6 +473,38 @@ const docTemplate = `{
                     }
                 }
             }
+        },
+        "/payment/user/completed": {
+            "post": {
+                "description": "complete user payment",
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "user payment"
+                ],
+                "summary": "Complete User Payment and save a record as invoice",
+                "parameters": [
+                    {
+                        "type": "string",
+                        "description": "jwtToken of the user",
+                        "name": "authentication",
+                        "in": "header",
+                        "required": true
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "returns a success message",
+                        "schema": {
+                            "type": "string"
+                        }
+                    }
+                }
+            }
         }
     },
     "definitions": {
@@ -569,6 +569,9 @@ const docTemplate = `{
                 "bookingId": {
                     "type": "integer"
                 },
+                "chargerAddress": {
+                    "type": "string"
+                },
                 "charger_id": {
                     "type": "integer"
                 },
@@ -587,8 +590,17 @@ const docTemplate = `{
                 "id": {
                     "type": "integer"
                 },
+                "normalRate": {
+                    "type": "number"
+                },
                 "paymentStatus": {
                     "type": "string"
+                },
+                "providerId": {
+                    "type": "integer"
+                },
+                "rateId": {
+                    "type": "integer"
                 },
                 "start_time": {
                     "type": "string"

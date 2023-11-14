@@ -22,7 +22,7 @@ import (
 // @Param authentication header string true "jwtToken of the user"
 // @Param booking_id path int true "booking id"
 // @Success 200 {object} []dto.UserPayment "returns a user payment object"
-// @Router /payment/user/{booking_id} [get]
+// @Router /payment/user/booking/{booking_id} [get]
 func GetUserPaymentHandler(c *gin.Context) {
 
 	tokenStr := c.GetHeader("Authentication")
@@ -104,7 +104,7 @@ func CreateUserPaymentHandler(c *gin.Context) {
 // @Accept json
 // @Produce json
 // @Param authentication header string true "jwtToken of the user"
-// @Router /payment/user/{booking_id} [put]
+// @Router /payment/user/booking/{booking_id} [put]
 // @Success 200 {object} string "returns a success message"
 func UpdateUserPaymentHandler(c *gin.Context) {
 	var (
@@ -148,7 +148,7 @@ func UpdateUserPaymentHandler(c *gin.Context) {
 // @Accept json
 // @Produce json
 // @Param authentication header string true "jwtToken of the user"
-// @Router /payment/user/{booking_id} [delete]
+// @Router /payment/user/booking/{booking_id} [delete]
 // @Success 200 {object} string "returns a success message"
 func DeleteUserPaymentHandler(c *gin.Context) {
 	var (
@@ -231,7 +231,7 @@ func CompleteUserPaymentHandler(c *gin.Context) {
 // @Tags user payment
 // @Accept json
 // @Produce json
-// @Router /payment/user/getAllBooking [get]
+// @Router /payment/user/booking [get]
 // @Param authentication header string true "jwtToken of the user"
 // @Success 200 {object} map[string][]dto.UserPayment "returns a map of user payment for, pending and completed"
 func GetAllUserPaymentHandler(c *gin.Context) {
