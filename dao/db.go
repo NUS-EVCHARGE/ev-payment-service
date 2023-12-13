@@ -19,6 +19,8 @@ type Database interface {
 	GetProviderPaymentEntry(providerId uint, billingPeriod dto.ProviderBillingPeriod) ([]dto.ProviderPayment, error)
 	UpdateProviderPaymentEntry(providerPayment *dto.ProviderPayment) error
 	DeleteProviderPaymentEntry(id uint, billingPeriod dto.ProviderBillingPeriod) error
+
+	Close()
 }
 
 var (
@@ -29,7 +31,14 @@ type DbImpl struct {
 	MongoClient *mongo.Client
 }
 
-func InitDB(dns string) *mongo.Client {
+func (db *DbImpl) Close() {
+	err := db.MongoClient.Disconnect(context.Background())
+	if err != nil {
+		logrus.WithField("err", err).Info("error disconnecting from database")
+	}“
+}
+
+func InitDB(dns string) {
 	client, err := mongo.Connect(context.TODO(), options.Client().ApplyURI(dns))
 	if err != nil {
 		err := client.Disconnect(context.Background())
@@ -46,8 +55,6 @@ func InitDB(dns string) *mongo.Client {
 	}
 
 	Db = NewDatabase(client)
-
-	return client
 }
 
 func NewDatabase(client *mongo.Client) Database {

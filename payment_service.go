@@ -1,7 +1,6 @@
 package main
 
 import (
-	"context"
 	"encoding/json"
 	"ev-payment-service/config"
 	providerpayment "ev-payment-service/controller/provider"
@@ -16,7 +15,6 @@ import (
 	"github.com/sirupsen/logrus"
 	swaggerfiles "github.com/swaggo/files"
 	ginSwagger "github.com/swaggo/gin-swagger"
-	"go.mongodb.org/mongo-driver/mongo"
 	"os"
 	"time"
 )
@@ -50,14 +48,28 @@ func main() {
 		return
 	}
 
-	var mongoHostname string
-	var documentSecret = retrieveSecretFromSecretManager("EV_DOCUMENTDB")
+	var hostname string
+
+	var documentSecret = retrieveSecretFromSecretManager("MYSQL_PASSWORD")
 	if documentSecret.Password != "" {
-		mongoHostname = "mongodb://" + documentSecret.Username + ":" + documentSecret.Password + "@docdb-2023-09-23-06-59-34.cluster-cdklkqeyoz4a.ap-southeast-1.docdb.amazonaws.com:27017/?tls=true&tlsCAFile=global-bundle.pem&replicaSet=rs0&readPreference=secondaryPreferred&retryWrites=false"
+		hostname = documentSecret.Username + ":" + documentSecret.Password + "@tcp(ev-charger-mysql-db.cdklkqeyoz4a.ap-southeast-1.rds.amazonaws.com:3306)/evc?parseTime=true&charset=utf8mb4"
 	} else {
-		mongoHostname = configObj.MongoDBURL
+		hostname = configObj.Dsn // localhost
 	}
-	client := dao.InitDB(mongoHostname)
+
+	dao.InitSqlDb(hostname)
+
+	if os.Getenv("USE_MONGO") != "" {
+		documentSecret = retrieveSecretFromSecretManager("EV_DOCUMENTDB")
+		if documentSecret.Password != "" {
+			hostname = "mongodb://" + documentSecret.Username + ":" + documentSecret.Password + "@docdb-2023-09-23-06-59-34.cluster-cdklkqeyoz4a.ap-southeast-1.docdb.amazonaws.com:27017/?tls=true&tlsCAFile=global-bundle.pem&replicaSet=rs0&readPreference=secondaryPreferred&retryWrites=false"
+		} else {
+			hostname = configObj.MongoDBURL
+		}
+
+		// overwrite global variable
+		dao.InitDB(hostname)
+	}
 
 	var stripeKey string
 	var stripeSecret = retrieveStripeKeyFromSecretManager("STRIPE_KEY")
@@ -71,12 +83,7 @@ func main() {
 	stripeHelper.StripeKey = stripeKey
 
 	//defer disconnect from database
-	defer func(client *mongo.Client, ctx context.Context) {
-		err := client.Disconnect(ctx)
-		if err != nil {
-			logrus.WithField("err", err).Info("error disconnecting from database")
-		}
-	}(client, context.Background())
+	defer dao.Db.Close()
 
 	InitHttpServer(configObj.HttpAddress)
 
