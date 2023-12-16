@@ -35,7 +35,7 @@ func (db *DbImpl) Close() {
 	err := db.MongoClient.Disconnect(context.Background())
 	if err != nil {
 		logrus.WithField("err", err).Info("error disconnecting from database")
-	}“
+	}
 }
 
 func InitDB(dns string) {
